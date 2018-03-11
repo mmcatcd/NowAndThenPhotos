@@ -45,6 +45,8 @@ const StackNav = StackNavigator({
     Camera: {
         screen: SceneCamera,
     }
+}, {
+    headerMode: 'none',
 });
 
 export default class SourcePicker extends React.Component {

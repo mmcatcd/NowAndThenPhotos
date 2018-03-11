@@ -8,7 +8,9 @@ import {
     Vibration, 
     CameraRoll, 
     Animated, 
-    Easing
+    Easing,
+    Dimensions,
+    Modal
 } from 'react-native';
 import {Camera, Permissions, FileSystem} from 'expo';
 
@@ -16,6 +18,7 @@ import {MaterialCommunityIcons} from '@expo/vector-icons';
 import Grid from './Grid';
 
 let test = new Animated.Value(5);
+const window = Dimensions.get('window');
 
 export default class SceneCamera extends React.Component {
     state = {
@@ -80,7 +83,7 @@ export default class SceneCamera extends React.Component {
 
     render() {
         let {optionsHeight} = this.state;
-        const resultImg = this.props.navigation.state.params.result.uri;
+        const resultImg = this.props.navigation.state.params != null ? this.props.navigation.state.params.result.uri : null;
 
         const styles = StyleSheet.create({
             container: {
@@ -111,7 +114,9 @@ export default class SceneCamera extends React.Component {
                 backgroundColor: '#F93943',
                 opacity: 0.9,
                 justifyContent: 'center',
-                alignItems: 'center'
+                alignItems: 'center',
+                position: 'absolute',
+                bottom: 0
             },
             optionsIconsContainer: {
                 flexDirection: 'row',
@@ -130,8 +135,10 @@ export default class SceneCamera extends React.Component {
                 fontSize: 28
             },
             overlayImage: {
-                flex: 1,
-                opacity: 0.5
+                opacity: 0.3,
+                position: 'absolute',
+                width: window.width,
+                top: 0
             }
         });
 
@@ -158,20 +165,6 @@ export default class SceneCamera extends React.Component {
                         style={styles.cameraContainer} 
                         type={this.state.type}
                         >
-                        {(() => {
-                            if(this.state.overlay && resultImg != null) {
-                                return <Image source={{uri: resultImg}} style={styles.overlayImage} />;
-                            }
-                        })()}
-                        {(() => {
-                            if(this.state.grid) {
-                                return(
-                                    <View style={{flex: 1}} >
-                                        <Grid size={5} width={2} color="rgba(255, 255, 255, 0.5)" />
-                                    </View>
-                                )
-                            }
-                        })()}
                         <Animated.View style={[styles.optionsContainer, {height: optionsHeight}]}>
                             {(() => {
                                 if(this.state.optionsPressed) {
@@ -200,6 +193,8 @@ export default class SceneCamera extends React.Component {
                                 }
                             })()}
                         </Animated.View>
+                        <Grid size={5} width={this.state.grid ? 2 : 0} color="rgba(255, 255, 255, 0.5)"/>
+                        <Image source={{uri: resultImg}} style={[styles.overlayImage, {height: this.state.overlay ? window.height : 0},]} />
                     </Camera>
                     <View style={styles.controlsContainer} >
                         <View style={styles.controls}>
