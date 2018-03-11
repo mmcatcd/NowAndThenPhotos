@@ -10,9 +10,10 @@ import {
     Animated, 
     Easing,
     Dimensions,
-    Modal
+    Modal,
+    Platform
 } from 'react-native';
-import {Camera, Permissions, FileSystem} from 'expo';
+import {Camera, Permissions, FileSystem, Location, Constants} from 'expo';
 
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import Grid from './Grid';
@@ -20,20 +21,46 @@ import Grid from './Grid';
 let test = new Animated.Value(5);
 const window = Dimensions.get('window');
 
+const GEOLOCATION_OPTIONS = { 
+    enableHighAccuracy: true, 
+    timeout: 20000, 
+    maximumAge: 1000,
+    timeInterval: 1,
+    distanceInterval: 1
+ };
+
 export default class SceneCamera extends React.Component {
     state = {
+        location: {
+            latitude: 0,
+            longitude: 0,
+            altitude: 0
+        },
         hasCameraPermission: null,
         type: Camera.Constants.Type.back,
         photoId: 1,
         optionsPressed : false,
         optionsHeight: new Animated.Value(5),
         overlay: false,
-        grid: false
+        grid: false,
+        errorMessage: null
     }
 
     async componentWillMount() {
         const {status} = await Permissions.askAsync(Permissions.CAMERA);
         this.setState({ hasCameraPermission: status === 'granted' });
+
+        Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
+    }
+
+    locationChanged = (newLoc) => {
+        this.setState({
+            location: {
+                latitude: newLoc.coords.latitude,
+                longitude: newLoc.coords.longitude,
+                altitude: newLoc.coords.altitude
+            }
+        });
     }
 
     takePhoto = async () => {
@@ -82,6 +109,8 @@ export default class SceneCamera extends React.Component {
     }
 
     render() {
+        let longLat = this.state.location;
+        console.log(longLat);
         let {optionsHeight} = this.state;
         const resultImg = this.props.navigation.state.params != null ? this.props.navigation.state.params.result.uri : null;
 
@@ -188,6 +217,8 @@ export default class SceneCamera extends React.Component {
                                                     }
                                                 })()}
                                             </TouchableOpacity>
+                                            <Text>Long: {longLat.longitude}</Text>
+                                            <Text>Lat: {longLat.latitude}</Text>
                                         </View>
                                     )
                                 }

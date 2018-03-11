@@ -5,6 +5,7 @@ import {StackNavigator} from 'react-navigation';
 import {ImagePicker} from 'expo';
 
 import SceneCamera from './SceneCamera';
+import Map from './Map';
 
 class SourceScreen extends React.Component {
     accessGallery() {
@@ -33,6 +34,9 @@ class SourceScreen extends React.Component {
                 <Button 
                     title="Choose from Gallery"
                     onPress={this.pickImage} />
+                <Button 
+                    title="Map View"
+                    onPress={() => this.props.navigation.navigate('Map')}/>
             </View>
         );
     }
@@ -44,6 +48,9 @@ const StackNav = StackNavigator({
     },
     Camera: {
         screen: SceneCamera,
+    },
+    Map: {
+        screen: Map
     }
 }, {
     headerMode: 'none',
