@@ -25,6 +25,8 @@
     "react-native-camera": "^0.13.0",
     "react-native-gesture-handler": "^1.0.0-alpha.40",
     "react-native-tab-view": "0.0.74",
-    "react-navigation": "^1.0.2"
+    "react-navigation": "^1.0.2",
+    "react-redux": "^5.0.7",
+    "redux": "^3.7.2"
   }
 }
