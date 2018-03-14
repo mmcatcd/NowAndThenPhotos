@@ -8,6 +8,20 @@ import SceneCamera from './SceneCamera';
 import Map from './Map';
 
 class SourceScreen extends React.Component {
+    state = {}
+
+    // constructor(props) {
+    //     // super(props)
+    // }
+
+    componentDidMount() {
+        let params = this.props.navigation.state.params
+        console.log("params", this.props.navigation.state.params)
+        this.setState({
+            sceneId: params && params.sceneId
+        })
+    }
+
     accessGallery() {
         console.log("Access Gallery");
         console.log(photos);
@@ -18,7 +32,7 @@ class SourceScreen extends React.Component {
           allowsEditing: true,
           aspect: [4, 3],
         });
-    
+
         if (!result.cancelled) {
           this.setState({ image: result.uri });
           this.props.navigation.navigate('Camera', {result});
@@ -28,13 +42,14 @@ class SourceScreen extends React.Component {
     render() {
         return(
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} >
+                <Text>{this.state.sceneId}</Text>
                 <Button
                     title="Take a photo"
-                    onPress={()  => this.props.navigation.navigate('Camera')} />
-                <Button 
+                    onPress={() => this.props.navigation.navigate('Camera')} />
+                <Button
                     title="Choose from Gallery"
                     onPress={this.pickImage} />
-                <Button 
+                <Button
                     title="Map View"
                     onPress={() => this.props.navigation.navigate('Map')}/>
             </View>
