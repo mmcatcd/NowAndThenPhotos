@@ -1,13 +1,13 @@
 import React from 'react';
 import {
-    Text, 
-    View, 
-    StyleSheet, 
-    TouchableOpacity, 
-    Image, 
-    Vibration, 
-    CameraRoll, 
-    Animated, 
+    Text,
+    View,
+    StyleSheet,
+    TouchableOpacity,
+    Image,
+    Vibration,
+    CameraRoll,
+    Animated,
     Easing,
     Dimensions,
     Modal,
@@ -18,18 +18,23 @@ import {Camera, Permissions, FileSystem, Location, Constants} from 'expo';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import Grid from './Grid';
 
+import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+
+import * as Actions from '../actions'; //Import your actions
+
 let test = new Animated.Value(5);
 const window = Dimensions.get('window');
 
-const GEOLOCATION_OPTIONS = { 
-    enableHighAccuracy: true, 
-    timeout: 20000, 
+const GEOLOCATION_OPTIONS = {
+    enableHighAccuracy: true,
+    timeout: 20000,
     maximumAge: 1000,
     timeInterval: 1,
     distanceInterval: 1
  };
 
-export default class SceneCamera extends React.Component {
+class SceneCamera extends React.Component {
     state = {
         location: {
             latitude: 0,
@@ -58,22 +63,24 @@ export default class SceneCamera extends React.Component {
                     //altitude: newLoc.coords.altitude
                 }
             });
-        }); 
+        });
     }
 
     takePhoto = async () => {
         Vibration.vibrate();
         if (this.camera) {
-            let photo = await this.camera.takePictureAsync().then(data => {
-                CameraRoll.saveToCameraRoll(data.uri);
-            });
+            let photo = await this.camera.takePictureAsync()
+            let savedUri = await CameraRoll.saveToCameraRoll(photo.uri)
+            let sceneId = this.props.screenProps.sceneId
+
+            this.props.createPhoto(savedUri, sceneId)
         }
     }
 
     flipCamera() {
         this.setState({
-            type: this.state.type === Camera.Constants.Type.back 
-                    ? Camera.Constants.Type.front 
+            type: this.state.type === Camera.Constants.Type.back
+                    ? Camera.Constants.Type.front
                     : Camera.Constants.Type.back,
         });
     }
@@ -185,11 +192,11 @@ export default class SceneCamera extends React.Component {
         } else {
             return(
                 <View style={styles.container}>
-                    <Camera 
+                    <Camera
                         ref={ref => {
                             this.camera = ref;
                         }}
-                        style={styles.cameraContainer} 
+                        style={styles.cameraContainer}
                         type={this.state.type}
                         >
                         <Animated.View style={[styles.optionsContainer, {height: optionsHeight}]}>
@@ -223,7 +230,7 @@ export default class SceneCamera extends React.Component {
                             })()}
                         </Animated.View>
                         <Grid size={5} width={this.state.grid ? 2 : 0} color="rgba(255, 255, 255, 0.5)"/>
-                        <Image source={{uri: resultImg}} style={[styles.overlayImage, {height: this.state.overlay ? window.height : 0},]} />
+                        {resultImg && <Image source={{uri: resultImg}} style={[styles.overlayImage, {height: this.state.overlay ? window.height : 0},]} />}
                     </Camera>
                     <View style={styles.controlsContainer} >
                         <View style={styles.controls}>
@@ -252,3 +259,10 @@ export default class SceneCamera extends React.Component {
         }
     }
 }
+
+
+const mapStateToProps = (state, props) => ({ loading: state.sceneReducer.loading, photos: state.sceneReducer.photos, scenes: state.sceneReducer.scenes })
+const mapDispatchToProps = (dispatch) => bindActionCreators(Actions, dispatch)
+
+//Connect everything
+export default connect(mapStateToProps, mapDispatchToProps)(SceneCamera);

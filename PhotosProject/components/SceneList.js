@@ -28,7 +28,6 @@ class SceneList extends React.Component {
 
     render() {
         let scenes = Object.values(this.props.scenes)
-        console.log(scenes)
         return (
             <View style={styles.container}>
                 <SceneButton text="New Scene" color="#000000" onPress={() => {
