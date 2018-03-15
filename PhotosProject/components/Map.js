@@ -21,8 +21,14 @@ export default class Map extends React.Component {
         }
     }
 
+    removeLocationWatcher = null
+
     componentWillMount() {
-        Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
+        Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged).then(watcher => this.removeLocationWatcher = watcher.remove)
+    }
+
+    componentWillUnmount() {
+        this.removeLocationWatcher && this.removeLocationWatcher()
     }
 
     locationChanged = (location) => {
