@@ -7,18 +7,20 @@ import {ImagePicker} from 'expo';
 import SceneCamera from './SceneCamera';
 import Map from './Map';
 
+let sceneID;
+
 class SourceScreen extends React.Component {
-    state = {}
+    state = {
+        sceneId: null,
+    }
 
     // constructor(props) {
     //     // super(props)
     // }
 
     componentDidMount() {
-        let params = this.props.navigation.state.params
-        console.log("params", this.props.navigation.state.params)
         this.setState({
-            sceneId: params && params.sceneId
+            sceneId: sceneID
         })
     }
 
@@ -34,7 +36,6 @@ class SourceScreen extends React.Component {
         });
 
         if (!result.cancelled) {
-          this.setState({ image: result.uri });
           this.props.navigation.navigate('Camera', {result});
         }
     };
@@ -72,6 +73,9 @@ const StackNav = StackNavigator({
 });
 
 export default class SourcePicker extends React.Component {
+    componentDidMount() {
+        sceneID = this.props.navigation.state.params.sceneId;
+    }
     render() {
         return <StackNav />;
     }
