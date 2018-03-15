@@ -7,7 +7,23 @@ import {ImagePicker} from 'expo';
 import SceneCamera from './SceneCamera';
 import Map from './Map';
 
+let sceneID;
+
 class SourceScreen extends React.Component {
+    state = {
+        sceneId: null,
+    }
+
+    // constructor(props) {
+    //     // super(props)
+    // }
+
+    componentDidMount() {
+        this.setState({
+            sceneId: sceneID
+        })
+    }
+
     accessGallery() {
         console.log("Access Gallery");
         console.log(photos);
@@ -18,9 +34,8 @@ class SourceScreen extends React.Component {
           allowsEditing: true,
           aspect: [4, 3],
         });
-    
+
         if (!result.cancelled) {
-          this.setState({ image: result.uri });
           this.props.navigation.navigate('Camera', {result});
         }
     };
@@ -28,13 +43,14 @@ class SourceScreen extends React.Component {
     render() {
         return(
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}} >
+                <Text>{this.state.sceneId}</Text>
                 <Button
                     title="Take a photo"
-                    onPress={()  => this.props.navigation.navigate('Camera')} />
-                <Button 
+                    onPress={() => this.props.navigation.navigate('Camera')} />
+                <Button
                     title="Choose from Gallery"
                     onPress={this.pickImage} />
-                <Button 
+                <Button
                     title="Map View"
                     onPress={() => this.props.navigation.navigate('Map')}/>
             </View>
@@ -57,6 +73,9 @@ const StackNav = StackNavigator({
 });
 
 export default class SourcePicker extends React.Component {
+    componentDidMount() {
+        sceneID = this.props.navigation.state.params.sceneId;
+    }
     render() {
         return <StackNav />;
     }

@@ -50,17 +50,15 @@ export default class SceneCamera extends React.Component {
         const {status} = await Permissions.askAsync(Permissions.CAMERA);
         this.setState({ hasCameraPermission: status === 'granted' });
 
-        Location.watchPositionAsync(GEOLOCATION_OPTIONS, this.locationChanged);
-    }
-
-    locationChanged = (newLoc) => {
-        this.setState({
-            location: {
-                latitude: newLoc.coords.latitude,
-                longitude: newLoc.coords.longitude,
-                altitude: newLoc.coords.altitude
-            }
-        });
+        Location.watchPositionAsync(GEOLOCATION_OPTIONS, (newLoc) => {
+            this.setState({
+                location: {
+                    latitude: newLoc.coords.latitude,
+                    longitude: newLoc.coords.longitude,
+                    //altitude: newLoc.coords.altitude
+                }
+            });
+        }); 
     }
 
     takePhoto = async () => {

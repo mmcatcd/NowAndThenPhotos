@@ -1,14 +1,39 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import {StackNavigator} from 'react-navigation';
 
 import SceneCamera from './components/SceneCamera';
 import SourcePicker from './components/SourcePicker';
+import SceneList from './components/SceneList';
+
+import { createStore, applyMiddleware } from 'redux';
+import { Provider } from 'react-redux'
+import thunk from 'redux-thunk';
+import reducer from './reducers'
+
+const store = createStore(reducer, applyMiddleware(thunk))
+
 
 export default class App extends React.Component {
   render() {
-    return <SourcePicker />
+    return <Provider store={store}>
+      <StackNav />
+    </Provider>
   }
 }
+
+
+const StackNav = StackNavigator({
+    Home: {
+        screen: SceneList,
+    },
+    SourcePicker: {
+        screen: SourcePicker,
+    }
+}, {
+    headerMode: 'none',
+});
+
 
 const styles = StyleSheet.create({
   container: {
