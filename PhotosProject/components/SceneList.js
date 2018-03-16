@@ -7,6 +7,7 @@ import {StackNavigator} from 'react-navigation';
 import SourcePicker from './SourcePicker';
 import SceneForm from './SceneForm';
 import SceneButton from './SceneButton';
+import Header from './Header';
 
 import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
@@ -20,41 +21,38 @@ class SceneList extends React.Component {
         super(props);
     }
 
-    componentDidMount() {
-        //this.props.createScene("My Scene")
-        // this.props.addScene({id: 9, name: "yup"})
-        // this.props.addScene({id: 10, name: "good"})
-    }
-
     render() {
         let scenes = Object.values(this.props.scenes)
         return (
-            <View style={styles.container}>
-                {/*<SceneButton text="New Scene" color="#000000" onPress={() => {
-                    this.setState({showCreateSceneForm: true})
-                }}/>
-            {this.state.showCreateSceneForm && <SceneForm handleSubmit={this.props.createScene}/>} */}
+            <View style={{flex: 1}}>
+                <Header title="scenes" />
+                <View style={styles.container}>
+                    {/*<SceneButton text="New Scene" color="#000000" onPress={() => {
+                        this.setState({showCreateSceneForm: true})
+                    }}/>
+                {this.state.showCreateSceneForm && <SceneForm handleSubmit={this.props.createScene}/>} */}
 
-                <SceneButton text="New Scene" color="#F93943" onPress={() => this.props.navigation.navigate('NewScene', {handleSubmit: this.props.createScene})} />
-                <List>
-                  <FlatList
-                    data={scenes}
-                    keyExtractor={item => item.id}
-                    renderItem={({ item }) => (
-                      <ListItem
-                        // roundAvatar
-                        title={item.name}
-                        subtitle={item.id}
-                        // onPress={() => this.props.navigation.navigate('SourcePicker', {sceneId: 8})}
-                        onPress={() => {
-                            console.log("Scene ID for link ", item.id)
-                            return this.props.navigation.navigate('SourcePicker', {sceneId: item.id})
-                        }}
-                        // avatar={{ uri: item.picture.thumbnail }}
-                      />
-                    )}
-                  />
-                </List>
+                    <SceneButton text="New Scene" color="#F93943" onPress={() => this.props.navigation.navigate('NewScene', {handleSubmit: this.props.createScene})} />
+                    <List>
+                    <FlatList
+                        data={scenes}
+                        keyExtractor={item => item.id}
+                        renderItem={({ item }) => (
+                        <ListItem
+                            // roundAvatar
+                            title={item.name}
+                            subtitle={item.id}
+                            // onPress={() => this.props.navigation.navigate('SourcePicker', {sceneId: 8})}
+                            onPress={() => {
+                                console.log("Scene ID for link ", item.id)
+                                return this.props.navigation.navigate('SourcePicker', {sceneId: item.id})
+                            }}
+                            // avatar={{ uri: item.picture.thumbnail }}
+                        />
+                        )}
+                    />
+                    </List>
+                </View>
             </View>
         );
     }
