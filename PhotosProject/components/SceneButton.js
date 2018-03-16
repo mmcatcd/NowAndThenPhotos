@@ -8,10 +8,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
 
-        paddingTop: 10,
-		paddingBottom: 10,
-		paddingLeft: 75,
-        paddingRight: 75,
+        /*
+        paddingTop: this.props.topPad != null ? this.props.topPad : 10,
+        paddingBottom: this.props.topPad != null ? this.props.topPad : 10,
+        paddingLeft: this.props.sidePad  != null? this.props.sidePad : 75,
+        paddingRight: this.props.sidePad != null ? this.props.sidePad : 75, */
 
         borderWidth: 2,
     },
@@ -35,13 +36,22 @@ export default class SceneButton extends React.Component {
     }
 
     render() {
+        const topPad = this.props.topPad != null ? this.props.topPad : 10;
+        const sidePad = this.props.sidePad != null ? this.props.sidePad : 75;
+        const width = this.props.width != null ? this.props.width : null
+
         if(!this.state.fontLoaded){
             return <View />;
         }
 
         return(
             <TouchableHighlight 
-                style={[styles.button, {borderColor: this.props.color}]} 
+                style={[styles.button, {
+                    borderColor: this.props.color, 
+                    paddingTop: topPad, 
+                    paddingBottom: topPad, 
+                    width: width
+                }]} 
                 onPress={() => this.props.onPress()}>
                 <Text style={[styles.text, {color: this.props.color}]}>{this.props.text}</Text>
             </TouchableHighlight>
