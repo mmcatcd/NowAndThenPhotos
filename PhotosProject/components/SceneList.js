@@ -21,7 +21,7 @@ class SceneList extends React.Component {
     }
 
     componentDidMount() {
-        this.props.createScene("My Scene")
+        //this.props.createScene("My Scene")
         // this.props.addScene({id: 9, name: "yup"})
         // this.props.addScene({id: 10, name: "good"})
     }
@@ -30,10 +30,12 @@ class SceneList extends React.Component {
         let scenes = Object.values(this.props.scenes)
         return (
             <View style={styles.container}>
-                <SceneButton text="New Scene" color="#000000" onPress={() => {
+                {/*<SceneButton text="New Scene" color="#000000" onPress={() => {
                     this.setState({showCreateSceneForm: true})
                 }}/>
-                {this.state.showCreateSceneForm && <SceneForm handleSubmit={this.props.createScene}/>}
+            {this.state.showCreateSceneForm && <SceneForm handleSubmit={this.props.createScene}/>} */}
+
+                <SceneButton text="New Scene" color="#F93943" onPress={() => this.props.navigation.navigate('NewScene', {handleSubmit: this.props.createScene})} />
                 <List>
                   <FlatList
                     data={scenes}

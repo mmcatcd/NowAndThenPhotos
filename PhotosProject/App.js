@@ -5,6 +5,7 @@ import {StackNavigator} from 'react-navigation';
 import SceneCamera from './components/SceneCamera';
 import SourcePicker from './components/SourcePicker';
 import SceneList from './components/SceneList';
+import NewScene from './components/NewScene';
 
 import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux'
@@ -29,6 +30,12 @@ const StackNav = StackNavigator({
     },
     SourcePicker: {
         screen: SourcePicker,
+    },
+    NewScene: {
+      screen: NewScene
+    },
+    SceneCamera: {
+      screen: SceneCamera
     }
 }, {
     headerMode: 'none',
