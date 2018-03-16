@@ -51,6 +51,8 @@ class SceneCamera extends React.Component {
         errorMessage: null
     }
 
+    removeLocationWatcher = null;
+
     async componentWillMount() {
         const {status} = await Permissions.askAsync(Permissions.CAMERA);
         this.setState({ hasCameraPermission: status === 'granted' });
@@ -60,10 +62,14 @@ class SceneCamera extends React.Component {
                 location: {
                     latitude: newLoc.coords.latitude,
                     longitude: newLoc.coords.longitude,
-                    //altitude: newLoc.coords.altitude
+                    altitude: newLoc.coords.altitude
                 }
             });
-        });
+        }).then(watcher => this.removeLocationWatcher = watcher.remove);
+    }
+
+    componentWillUnmount() {
+        this.removeLocationWatcher && this.removeLocationWatcher();
     }
 
     takePhoto = async () => {
