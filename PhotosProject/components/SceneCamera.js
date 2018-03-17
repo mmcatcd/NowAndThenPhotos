@@ -51,6 +51,10 @@ class SceneCamera extends React.Component {
         errorMessage: null
     }
 
+    static navigationOptions = {
+        header: null
+    };
+
     removeLocationWatcher = null;
 
     async componentWillMount() {

@@ -7,7 +7,6 @@ import {StackNavigator} from 'react-navigation';
 import SourcePicker from './SourcePicker';
 import SceneForm from './SceneForm';
 import SceneButton from './SceneButton';
-import Header from './Header';
 
 import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
@@ -17,6 +16,10 @@ import * as Actions from '../actions'; //Import your actions
 class SceneList extends React.Component {
     state = { showCreateSceneForm: false }
 
+    static navigationOptions = {
+        title: 'scenes',
+    };
+
     constructor(props) {
         super(props);
     }
@@ -25,13 +28,8 @@ class SceneList extends React.Component {
         let scenes = Object.values(this.props.scenes)
         return (
             <View style={{flex: 1}}>
-                <Header title="scenes" />
+                {/*<Header title="scenes" />*/}
                 <View style={styles.container}>
-                    {/*<SceneButton text="New Scene" color="#000000" onPress={() => {
-                        this.setState({showCreateSceneForm: true})
-                    }}/>
-                {this.state.showCreateSceneForm && <SceneForm handleSubmit={this.props.createScene}/>} */}
-
                     <SceneButton text="New Scene" color="#F93943" onPress={() => this.props.navigation.navigate('NewScene', {handleSubmit: this.props.createScene})} />
                     <List>
                     <FlatList

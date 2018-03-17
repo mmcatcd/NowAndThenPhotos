@@ -4,7 +4,6 @@ import {View, Text, StyleSheet} from 'react-native';
 import {ImagePicker} from 'expo';
 import SceneButton from './SceneButton';
 import SourceButton from './SourceButton';
-import Header from './Header';
 import t from 'tcomb-form-native';
 
 const Form = t.form.Form;
@@ -36,6 +35,11 @@ export default class NewScene extends React.Component {
         image: null
     }
 
+    static navigationOptions = {
+        title: 'new scene',
+        headerRight: (<View />),
+    };
+
     componentDidMount() {
         this.refs.form.getComponent('name').refs.input.focus();
     }
@@ -59,7 +63,7 @@ export default class NewScene extends React.Component {
     render() {
         return(
             <View style={styles.container}>
-                <Header title="new scene" />
+                {/*<Header title="new scene" />*/}
                 <View style={styles.container}>
                     <View style={styles.formContainer}><Form ref="form" type={FormType} /></View>
                     <View style={styles.buttonContainer}>
