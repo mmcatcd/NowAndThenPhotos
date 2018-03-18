@@ -18,6 +18,8 @@ class SceneList extends React.Component {
 
     static navigationOptions = {
         title: 'scenes',
+        headerLeft: (<View />),
+        headerRight: (<View />),
     };
 
     constructor(props) {
