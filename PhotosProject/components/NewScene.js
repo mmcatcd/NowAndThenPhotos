@@ -8,6 +8,12 @@ import t from 'tcomb-form-native';
 
 const Form = t.form.Form;
 
+//Redux imports
+import {bindActionCreators} from 'redux';
+import { connect } from 'react-redux';
+
+import * as Actions from '../actions'; //Import your actions
+
 const FormType = t.struct({
     name: t.String
 });
@@ -30,7 +36,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export default class NewScene extends React.Component {
+class NewScene extends React.Component {
     state = {
         image: null
     }
@@ -45,7 +51,7 @@ export default class NewScene extends React.Component {
     }
 
     handleSubmit() {
-        this.props.navigation.state.params.handleSubmit(this.refs.form.getValue().name);
+        this.props.createScene(this.refs.form.getValue().name);
         this.props.navigation.navigate('Home');
     }
 
@@ -78,3 +84,9 @@ export default class NewScene extends React.Component {
         )
     }
 }
+
+const mapStateToProps = (state, props) => ({ loading: state.sceneReducer.loading, photos: state.sceneReducer.photos, scenes: state.sceneReducer.scenes })
+const mapDispatchToProps = (dispatch) => bindActionCreators(Actions, dispatch)
+
+//Connect everything
+export default connect(mapStateToProps, mapDispatchToProps)(NewScene);

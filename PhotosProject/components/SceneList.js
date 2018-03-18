@@ -30,7 +30,7 @@ class SceneList extends React.Component {
             <View style={{flex: 1}}>
                 {/*<Header title="scenes" />*/}
                 <View style={styles.container}>
-                    <SceneButton text="New Scene" color="#F93943" onPress={() => this.props.navigation.navigate('NewScene', {handleSubmit: this.props.createScene})} />
+                    <SceneButton text="New Scene" color="#F93943" onPress={() => this.props.navigation.navigate('NewScene')} />
                     <List>
                     <FlatList
                         data={scenes}
