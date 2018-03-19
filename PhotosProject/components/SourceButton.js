@@ -9,8 +9,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
 
-        paddingTop: 20,
-		paddingBottom: 20,
+        paddingTop: 10,
+		paddingBottom: 10,
 		paddingLeft: 20,
         paddingRight: 20,
 
@@ -49,10 +49,13 @@ export default class SourceButton extends React.Component {
 
         return(
             <TouchableHighlight 
-                style={[styles.button, {borderColor: this.props.color}]} 
+                style={[styles.button, {
+                    borderColor: this.props.borderColor != null ? this.props.borderColor : '#F93943',
+                    backgroundColor: this.props.backgroundColor != null ? this.props.backgroundColor : '#fff'
+                }]} 
                 onPress={() => this.props.onPress()}>
                 <View style={styles.container} >
-                    <MaterialCommunityIcons name={this.props.icon} size={50} color="#F93943" />
+                    <MaterialCommunityIcons name={this.props.icon} size={80} color={this.props.color} />
                     <Text style={[styles.text, {color: this.props.color}]}>{this.props.text}</Text>
                 </View>
             </TouchableHighlight>
