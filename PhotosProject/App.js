@@ -50,9 +50,6 @@ const StackNav = StackNavigator({
     },
     NewScene: {
       screen: NewScene
-    },
-    SceneCamera: {
-      screen: SceneCamera
     }
 }, {
     //headerMode: 'none',
