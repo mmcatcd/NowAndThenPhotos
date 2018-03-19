@@ -12,3 +12,11 @@ export const createPhoto = (url, sceneId) => ({
     url,
     sceneId
 })
+
+export const ADD_LOCATION = 'ADD_LOCATION'
+
+export const addLocation = (location, sceneId) => ({
+    type: ADD_LOCATION,
+    sceneId,
+    location
+})

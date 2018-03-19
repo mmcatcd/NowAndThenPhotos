@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-import { CREATE_SCENE, CREATE_PHOTO } from "../actions/"
+import { CREATE_SCENE, CREATE_PHOTO, ADD_LOCATION } from "../actions/"
 
 const uuidv1 = require('uuid/v1');
 
@@ -13,7 +13,7 @@ let initialState = {
 const sceneReducer = (state = initialState, action) => {
     switch (action.type) {
         case CREATE_SCENE:
-            scene = { id: uuidv1(), name: action.name, photoIds: [] }
+            scene = { id: uuidv1(), name: action.name, location: {}, photoIds: [] }
             // state = Object.assign({}, state, { scenes: {...state.scenes, [scene.id]: scene}, loading: false });
             state = {
                 ...state,
@@ -30,6 +30,20 @@ const sceneReducer = (state = initialState, action) => {
                 photos: {...state.photos, [photo.id]: photo},
                 scenes: {...state.scenes, [action.sceneId]: updatedScene}
             }
+            return state;
+        case ADD_LOCATION:
+            state = {
+                ...state,
+                scenes: {
+                    ...state.scenes,
+                    [action.sceneId]: {
+                        ...state.scenes[action.sceneId],
+                        location: action.location
+                    }
+                }
+            }
+
+            console.log(JSON.stringify(state.scenes));
             return state;
         default:
             return state;
