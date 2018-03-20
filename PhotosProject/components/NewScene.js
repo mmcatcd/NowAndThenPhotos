@@ -226,9 +226,8 @@ class NewScene extends React.Component {
         this.setState({cameraVisible: false});
     }
 
-    updateImage(image, location) {
-        this.setState({image: image, location: location});
-        console.log(this.state.location);
+    updateImage(image) {
+        this.setState({image});
     }
 
     render() {

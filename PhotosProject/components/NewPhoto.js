@@ -13,7 +13,7 @@ import {
     Modal,
     Platform
 } from 'react-native';
-import {Camera, Permissions, FileSystem, Location, Constants} from 'expo';
+import {Camera, Permissions, FileSystem, Constants} from 'expo';
 
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import Grid from './Grid';
@@ -31,11 +31,6 @@ const GEOLOCATION_OPTIONS = {
 
 export default class NewPhoto extends React.Component {
     state = {
-        location: {
-            latitude: 0,
-            longitude: 0,
-            altitude: 0
-        },
         hasCameraPermission: null,
         type: Camera.Constants.Type.back,
         photoId: 1,
@@ -54,16 +49,6 @@ export default class NewPhoto extends React.Component {
     async componentWillMount() {
         const {status} = await Permissions.askAsync(Permissions.CAMERA);
         this.setState({ hasCameraPermission: status === 'granted' });
-
-        Location.watchPositionAsync(GEOLOCATION_OPTIONS, (newLoc) => {
-            this.setState({
-                location: {
-                    latitude: newLoc.coords.latitude,
-                    longitude: newLoc.coords.longitude,
-                    altitude: newLoc.coords.altitude
-                }
-            });
-        }).then(watcher => this.removeLocationWatcher = watcher.remove);
     }
 
     componentWillUnmount() {
