@@ -6,6 +6,7 @@ import SceneCamera from './components/SceneCamera';
 import SourcePicker from './components/SourcePicker';
 import SceneList from './components/SceneList';
 import NewScene from './components/NewScene';
+import SceneView from './components/SceneView';
 import {Font} from 'expo';
 
 import { createStore, applyMiddleware } from 'redux';
@@ -50,9 +51,11 @@ const StackNav = StackNavigator({
     },
     NewScene: {
       screen: NewScene
+    },
+    SceneView: {
+      screen: SceneView
     }
 }, {
-    //headerMode: 'none',
     navigationOptions: {
       headerStyle: {
         backgroundColor: '#F93943',

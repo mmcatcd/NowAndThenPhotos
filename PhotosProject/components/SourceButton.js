@@ -11,13 +11,13 @@ const styles = StyleSheet.create({
 
         paddingTop: 10,
 		paddingBottom: 10,
-		paddingLeft: 20,
-        paddingRight: 20,
+		paddingLeft: 10,
+        paddingRight: 10,
 
         marginLeft: 10,
         marginRight: 10,
 
-        borderWidth: 3,
+        borderWidth: 2,
     },
     container: {
         justifyContent: 'center',
@@ -55,7 +55,7 @@ export default class SourceButton extends React.Component {
                 }]} 
                 onPress={() => this.props.onPress()}>
                 <View style={styles.container} >
-                    <MaterialCommunityIcons name={this.props.icon} size={80} color={this.props.color} />
+                    <MaterialCommunityIcons name={this.props.icon} size={50} color={this.props.color} />
                     <Text style={[styles.text, {color: this.props.color}]}>{this.props.text}</Text>
                 </View>
             </TouchableHighlight>

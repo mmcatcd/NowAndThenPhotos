@@ -82,7 +82,7 @@ class SceneCamera extends React.Component {
             let photo = await this.camera.takePictureAsync()
             let savedUri = await CameraRoll.saveToCameraRoll(photo.uri)
             let sceneId = this.props.screenProps.sceneId
-
+            
             this.props.createPhoto(savedUri, sceneId)
         }
     }
