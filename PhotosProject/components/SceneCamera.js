@@ -81,9 +81,11 @@ class SceneCamera extends React.Component {
         if (this.camera) {
             let photo = await this.camera.takePictureAsync()
             let savedUri = await CameraRoll.saveToCameraRoll(photo.uri)
-            let sceneId = this.props.screenProps.sceneId
+            //let sceneId = this.props.screenProps.sceneId
+            let sceneId = this.props.sceneId;
             
             this.props.createPhoto(savedUri, sceneId)
+            this.props.close();
         }
     }
 
@@ -127,7 +129,8 @@ class SceneCamera extends React.Component {
         let longLat = this.state.location;
         console.log(longLat);
         let {optionsHeight} = this.state;
-        const resultImg = this.props.navigation.state.params != null ? this.props.navigation.state.params.result.uri : null;
+        //const resultImg = this.props.navigation.state.params != null ? this.props.navigation.state.params.result.uri : null;
+        const resultImg = this.props.image;
 
         const styles = StyleSheet.create({
             container: {
@@ -245,7 +248,7 @@ class SceneCamera extends React.Component {
                     <View style={styles.controlsContainer} >
                         <View style={styles.controls}>
                             <View style={styles.controlsView}>
-                                <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+                                <TouchableOpacity onPress={this.props.close}>
                                     <Text style={styles.exitText}>X</Text>
                                 </TouchableOpacity>
                             </View>

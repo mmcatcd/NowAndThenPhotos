@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {View, Text, StyleSheet, ScrollView, ListView, Image, Dimensions} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, ListView, Image, Dimensions, Modal, TouchableHighlight} from 'react-native';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 
 //Redux imports
@@ -8,18 +8,34 @@ import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
 
 import * as Actions from '../actions'; //Import your actions
+import SceneCamera from './SceneCamera';
 
 const window = Dimensions.get('window');
 
 class SceneView extends React.Component {
+    state = {
+        cameraVisible: false
+    }
+
+    closeCamera() {
+        this.setState({cameraVisible: false});
+    }
+
     render() {
         const sceneId = this.props.navigation.state.params.sceneId;
         const data = this.props.scenes[sceneId].photoIds;
-        /*const data = Object.values(this.props.scenes).find(scene => {
-            return scene.id == sceneId;
-        });*/
+        const overlayPhotoId = this.props.scenes[sceneId].photoIds[0];
+
         return (
             <View style={styles.container}>
+                <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={this.state.cameraVisible}
+                    onRequestClose={this.closeCamera.bind(this)}>
+                    <SceneCamera sceneId={sceneId} image={this.props.photos[overlayPhotoId].url} close={this.closeCamera.bind(this)} />
+                </Modal>
+
                 <ScrollView style={styles.scrollView} >
                     <View style={styles.imageContainer}>
                     {
@@ -33,7 +49,7 @@ class SceneView extends React.Component {
                     }
                     </View>
                 </ScrollView>
-                <BottomBar />
+                <BottomBar onPress={() => this.setState({cameraVisible: true})} />
             </View>
         )
     }
@@ -60,11 +76,13 @@ const styles = StyleSheet.create({
     }
 })
 
-const BottomBar = () => {
+const BottomBar = ({onPress}) => {
     return(
         <View style={bottomBarStyles.container}>
             <MaterialCommunityIcons name='settings' size={28} color='#fff' />
-            <MaterialCommunityIcons name='camera' size={28} color='#fff' />
+            <TouchableHighlight onPress={onPress}>
+                <MaterialCommunityIcons name='camera' size={28} color='#fff' />
+            </TouchableHighlight>
             <MaterialCommunityIcons name='play' size={28} color='#fff' />
         </View>
     )
