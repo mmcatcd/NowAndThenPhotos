@@ -1,7 +1,21 @@
 import React from 'react';
 
-import {View, Text, StyleSheet, Alert, TextInput, Modal, Platform, KeyboardAvoidingView, Keyboard} from 'react-native';
+import {
+    View, 
+    Text, 
+    StyleSheet, 
+    Alert, 
+    TextInput, 
+    Modal, 
+    Platform, 
+    KeyboardAvoidingView, 
+    Keyboard,
+    StatusBar,
+    TouchableOpacity
+} from 'react-native';
 import {ImagePicker, Location, Permissions, MapView, Constants} from 'expo';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
+import NavigationBar from 'react-native-navbar';
 import SceneButton from './SceneButton';
 import SourceButton from './SourceButton';
 import Dimensions from 'Dimensions';
@@ -184,7 +198,8 @@ class NewScene extends React.Component {
             await this.props.createPhoto(image, id);
             await this.props.addLocation(location, id);
 
-            this.props.navigation.navigate('SceneView', {sceneId: id});
+            //this.props.navigation.navigate('SceneView', {sceneId: id});
+            this.props.sceneCreated(id);
         } else if (image == null) {
             Alert.alert(
                 'No Image Selected',
@@ -240,12 +255,24 @@ class NewScene extends React.Component {
         return(
             <View style={[styles.container, {marginTop: keyboard.textFocused ? -keyboard.height : 0}]}>
                 <Modal
-                    animationType="slide"
+                    animationType='fade'
                     transparent={false}
                     visible={this.state.cameraVisible}
                     onRequestClose={this.closeModal.bind(this)}>
                     <NewPhoto onExit={this.closeModal.bind(this)} imageUpdate={this.updateImage.bind(this)} />
                 </Modal>
+                <NavigationBar 
+                    title={navBarConfig.title} 
+                    tintColor={navBarConfig.tintColor} 
+                    containerStyle={navBarConfig.containerStyle}
+                    leftButton={
+                        <TouchableOpacity
+                            onPress={() => this.props.close()}>
+                            <View style={{paddingLeft: 10, paddingTop: 8}}>
+                                <MaterialCommunityIcons name="close" size={28} color="#fff" />
+                            </View>
+                        </TouchableOpacity>
+                    } />
                 <View style={styles.container}>
                     <View style={styles.formContainer}>
                         <TextInput
@@ -260,7 +287,6 @@ class NewScene extends React.Component {
                             placeholder="Scene Name" />
                     </View>
                     <View style={styles.buttonContainer}>
-                        {/*<SourceButton text="Take Photo" icon="camera" color="#F93943" onPress={() => this.props.navigation.navigate('SceneCamera', {})} />*/}
                         <SourceButton text="Take Photo" icon="camera" color="#F93943" onPress={() => this.setState({cameraVisible: true})} />
                         <SourceButton text="Camera Roll" icon="image" backgroundColor="#F93943" color="#fff" onPress={this.pickImage} />
                     </View>
@@ -341,6 +367,24 @@ const styles = StyleSheet.create({
         borderBottomWidth: 2
     }
 });
+
+const navBarConfig = {
+    title: {
+        title: 'new scene',
+        tintColor: '#fff',
+        style: {
+            fontFamily: 'futura-medium',
+            fontWeight: '200',
+            fontSize: 24
+        }
+    },
+    tintColor: '#f93943',
+    containerStyle: {
+        paddingTop: 5,
+        paddingBottom: 5
+    },
+
+}
 
 const mapStateToProps = (state, props) => ({ loading: state.sceneReducer.loading, photos: state.sceneReducer.photos, scenes: state.sceneReducer.scenes })
 const mapDispatchToProps = (dispatch) => bindActionCreators(Actions, dispatch)

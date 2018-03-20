@@ -1,12 +1,13 @@
 import React from 'react';
 
-import {View, Text, FlatList, StyleSheet, TouchableHighlight} from 'react-native';
+import {View, Text, FlatList, StyleSheet, TouchableHighlight, Modal} from 'react-native';
 import { List, ListItem } from "react-native-elements";
 import {StackNavigator} from 'react-navigation';
 
 import SourcePicker from './SourcePicker';
 import SceneForm from './SceneForm';
 import SceneButton from './SceneButton';
+import NewScene from './NewScene';
 
 import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
@@ -14,7 +15,9 @@ import { connect } from 'react-redux';
 import * as Actions from '../actions'; //Import your actions
 
 class SceneList extends React.Component {
-    state = { showCreateSceneForm: false }
+    state = { 
+        newSceneVisible: false
+    }
 
     static navigationOptions = {
         title: 'scenes',
@@ -26,13 +29,31 @@ class SceneList extends React.Component {
         super(props);
     }
 
+    closeNewScene() {
+        this.setState({newSceneVisible: false});
+    }
+
+    sceneCreated(sceneId) {
+        this.setState({newSceneVisible: false});
+        this.props.navigation.navigate('SceneView', {sceneId});
+    }
+
     render() {
         let scenes = Object.values(this.props.scenes)
         return (
             <View style={{flex: 1}}>
-                {/*<Header title="scenes" />*/}
+                <Modal
+                    animationType="slide"
+                    transparent={false}
+                    visible={this.state.newSceneVisible}
+                    onRequestClose={this.closeNewScene.bind(this)}>
+                    <NewScene 
+                        sceneCreated={this.sceneCreated.bind(this)} 
+                        close={this.closeNewScene.bind(this)} />
+                </Modal>
                 <View style={styles.container}>
-                    <SceneButton text="New Scene" color="#F93943" onPress={() => this.props.navigation.navigate('NewScene')} />
+                    {/*<SceneButton text="New Scene" color="#F93943" onPress={() => this.props.navigation.navigate('NewScene')} />*/}
+                    <SceneButton text="New Scene" color="#F93943" onPress={() => this.setState({newSceneVisible: true})} />
                     <List>
                     <FlatList
                         data={scenes}
@@ -42,12 +63,10 @@ class SceneList extends React.Component {
                             // roundAvatar
                             title={item.name}
                             subtitle={item.id}
-                            // onPress={() => this.props.navigation.navigate('SourcePicker', {sceneId: 8})}
                             onPress={() => {
                                 console.log("Scene ID for link ", item.id)
-                                return this.props.navigation.navigate('SourcePicker', {sceneId: item.id})
+                                return this.props.navigation.navigate('SceneView', {sceneId: item.id})
                             }}
-                            // avatar={{ uri: item.picture.thumbnail }}
                         />
                         )}
                     />
