@@ -7,14 +7,28 @@ import SourcePicker from './components/SourcePicker';
 import SceneList from './components/SceneList';
 import NewScene from './components/NewScene';
 import SceneView from './components/SceneView';
-import {Font} from 'expo';
+import {Font, AppLoading} from 'expo';
 
 import { createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux'
-import thunk from 'redux-thunk';
-import reducer from './reducers'
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import autoMergeLevel2 from 'redux-persist/lib/stateReconciler/autoMergeLevel2';
 
-const store = createStore(reducer, applyMiddleware(thunk))
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/lib/integration/react';
+import thunk from 'redux-thunk';
+import reducer from './reducers';
+
+//For stateReconciler https://github.com/rt2zz/redux-persist#state-reconciler
+const persistConfig = {
+  key: 'root',
+  storage,
+  stateReconciler: autoMergeLevel2 // Merges two levels deep rather than at root level
+}
+
+const persistedReducer = persistReducer(persistConfig, reducer);
+const store = createStore(persistedReducer, applyMiddleware(thunk));
+const persistor = persistStore(store);
 
 
 export default class App extends React.Component {
@@ -35,9 +49,13 @@ export default class App extends React.Component {
       return <View />;
     }
 
-    return <Provider store={store}>
-      <StackNav />
-    </Provider>
+    return( 
+      <Provider store={store}>
+        <PersistGate loading={<AppLoading />} persistor={persistor}>
+          <StackNav />
+        </PersistGate>
+      </Provider>
+    )
   }
 }
 
