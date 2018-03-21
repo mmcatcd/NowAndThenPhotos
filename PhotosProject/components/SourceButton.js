@@ -2,19 +2,26 @@ import React from 'react';
 
 import { Font } from 'expo';
 import {TouchableHighlight, Text, StyleSheet, View} from 'react-native';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 
 const styles = StyleSheet.create({
     button: {
         alignItems: 'center',
         justifyContent: 'center',
 
-        /*
-        paddingTop: this.props.topPad != null ? this.props.topPad : 10,
-        paddingBottom: this.props.topPad != null ? this.props.topPad : 10,
-        paddingLeft: this.props.sidePad  != null? this.props.sidePad : 75,
-        paddingRight: this.props.sidePad != null ? this.props.sidePad : 75, */
+        paddingTop: 10,
+		paddingBottom: 10,
+		paddingLeft: 10,
+        paddingRight: 10,
+
+        marginLeft: 10,
+        marginRight: 10,
 
         borderWidth: 2,
+    },
+    container: {
+        justifyContent: 'center',
+        alignItems: 'center'
     },
     text: {
         fontSize: 16,
@@ -22,7 +29,7 @@ const styles = StyleSheet.create({
     }
 });
 
-export default class SceneButton extends React.Component {
+export default class SourceButton extends React.Component {
     state = {
         fontLoaded: false,
     }
@@ -36,10 +43,6 @@ export default class SceneButton extends React.Component {
     }
 
     render() {
-        const topPad = this.props.topPad != null ? this.props.topPad : 10;
-        const sidePad = this.props.sidePad != null ? this.props.sidePad : 75;
-        const width = this.props.width != null ? this.props.width : null
-
         if(!this.state.fontLoaded){
             return <View />;
         }
@@ -47,13 +50,14 @@ export default class SceneButton extends React.Component {
         return(
             <TouchableHighlight 
                 style={[styles.button, {
-                    borderColor: this.props.color, 
-                    paddingTop: topPad, 
-                    paddingBottom: topPad, 
-                    width: width
+                    borderColor: this.props.borderColor != null ? this.props.borderColor : '#F93943',
+                    backgroundColor: this.props.backgroundColor != null ? this.props.backgroundColor : '#fff'
                 }]} 
                 onPress={() => this.props.onPress()}>
-                <Text style={[styles.text, {color: this.props.color}]}>{this.props.text}</Text>
+                <View style={styles.container} >
+                    <MaterialCommunityIcons name={this.props.icon} size={50} color={this.props.color} />
+                    <Text style={[styles.text, {color: this.props.color}]}>{this.props.text}</Text>
+                </View>
             </TouchableHighlight>
         );
     }
