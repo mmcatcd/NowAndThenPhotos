@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import {Camera, Permissions, FileSystem, Constants} from 'expo';
 
-import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {MaterialCommunityIcons, Ionicons} from '@expo/vector-icons';
 import Grid from './Grid';
 
 let test = new Animated.Value(5);
@@ -198,12 +198,12 @@ export default class NewPhoto extends React.Component {
                         <View style={styles.controls}>
                             <View style={styles.controlsView}>
                                 <TouchableOpacity onPress={this.props.onExit}>
-                                    <Text style={styles.exitText}>X</Text>
+                                    <Ionicons name="ios-close" size={70} color="#f93943" />
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.controlsView}>
                                 <TouchableOpacity onPress={this.takePhoto.bind(this)}>
-                                    <MaterialCommunityIcons name="circle" size={80} color="#F93943" />
+                                    <Ionicons name="ios-radio-button-on-outline" size={100} color="#F93943" />
                                 </TouchableOpacity>
                             </View>
                             <View style={styles.controlsView}>

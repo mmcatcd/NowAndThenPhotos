@@ -60,7 +60,6 @@ class NewScene extends React.Component {
             longitudeDelta: 0.0421
         },
         sceneLocation: null,
-        errorMessage: null,
         searchText: null,
         locationFrom: 'GPS',
         locationSearch: null,
@@ -80,9 +79,13 @@ class NewScene extends React.Component {
 
     componentWillMount() {
         if (Platform.OS === 'android' && !Constants.isDevice) {
-            this.setState({
-              errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
-            });
+            Alert.alert(
+                'Location Access Denied',
+                `Location access doesn't work on the android simulator. Please try on your device!`,
+                [
+                    {text: 'OK'}
+                ]
+            )
           } else {
             this._getLocationAsync();
         }
@@ -94,10 +97,13 @@ class NewScene extends React.Component {
     _getLocationAsync = async() => {
         let { status } = await Permissions.askAsync(Permissions.LOCATION);
         if (status !== 'granted') {
-            this.setState({
-                errorMessage: 'Permission to access location was denied',
-            });
-            console.log('Not granted!');
+            Alert.alert(
+                'Location Access Denied',
+                'Permission to access location was denied',
+                [
+                    {text: 'OK'}
+                ]
+            )
         }
 
         await Location.watchPositionAsync(GEOLOCATION_OPTIONS, (newLoc) => {
@@ -255,7 +261,7 @@ class NewScene extends React.Component {
         return(
             <View style={[styles.container, {marginTop: keyboard.textFocused ? -keyboard.height : 0}]}>
                 <Modal
-                    animationType='fade'
+                    animationType='slide'
                     transparent={false}
                     visible={this.state.cameraVisible}
                     onRequestClose={this.closeModal.bind(this)}>

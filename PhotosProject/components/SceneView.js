@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {View, Text, StyleSheet, ScrollView, ListView, Image, Dimensions, Modal, TouchableHighlight} from 'react-native';
+import {View, Text, StyleSheet, ScrollView, ListView, Image, Dimensions, Modal, TouchableOpacity} from 'react-native';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 
 //Redux imports
@@ -80,9 +80,9 @@ const BottomBar = ({onPress}) => {
     return(
         <View style={bottomBarStyles.container}>
             <MaterialCommunityIcons name='settings' size={28} color='#fff' />
-            <TouchableHighlight onPress={onPress}>
+            <TouchableOpacity onPress={onPress}>
                 <MaterialCommunityIcons name='camera' size={28} color='#fff' />
-            </TouchableHighlight>
+            </TouchableOpacity>
             <MaterialCommunityIcons name='play' size={28} color='#fff' />
         </View>
     )

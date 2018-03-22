@@ -234,12 +234,12 @@ class SceneCamera extends React.Component {
             <View style={styles.controls}>
               <View style={styles.controlsView}>
                 <TouchableOpacity onPress={this.props.close}>
-                  <Ionicons name="ios-close" size={50} color="#f93943" />
+                  <Ionicons name="ios-close" size={70} color="#f93943" />
                 </TouchableOpacity>
               </View>
               <View style={styles.controlsView}>
                 <TouchableOpacity onPress={this.takePhoto.bind(this)}>
-                  <MaterialCommunityIcons name="circle" size={80} color="#F93943" />
+                  <Ionicons name="ios-radio-button-on-outline" size={100} color="#F93943" />
                 </TouchableOpacity>
               </View>
               <View style={styles.controlsView}>
