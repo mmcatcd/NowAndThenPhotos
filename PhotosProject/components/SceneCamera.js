@@ -13,7 +13,7 @@ import {
   Modal,
   Platform,
   PanResponder,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
 } from 'react-native';
 import {Camera, Permissions, FileSystem, Location, Constants} from 'expo';
 import {scaleLinear} from 'd3-scale';
@@ -26,7 +26,6 @@ import { connect } from 'react-redux';
 
 import * as Actions from '../actions'; //Import your actions
 
-let test = new Animated.Value(5);
 const window = Dimensions.get('window');
 
 const GEOLOCATION_OPTIONS = {
@@ -53,7 +52,7 @@ class SceneCamera extends React.Component {
     grid: false,
     errorMessage: null,
     cameraHeight: null,
-    overlayOpacity: 0.5,
+    overlayOpacity: 0.5
   }
 
   static navigationOptions = {
@@ -79,9 +78,11 @@ class SceneCamera extends React.Component {
 
       onPanResponderMove: (e, {dx, dy}) => {
         //gesture progress
-        this.setState({
-          overlayOpacity: 0.5 + this.dragScaleY(dy)
-        });
+        if(this.state.overlay) {
+          this.setState({
+            overlayOpacity: 0.5 + this.dragScaleY(dy)
+          });
+        }
       },
 
       onPanResponderRelease: (ev, {vx, vy}) => {
@@ -157,9 +158,9 @@ class SceneCamera extends React.Component {
   }
 
   render() {
+    console.log(this.state.animatedOpacity);
     let longLat = this.state.location;
     let {optionsHeight} = this.state;
-    //const resultImg = this.props.navigation.state.params != null ? this.props.navigation.state.params.result.uri : null;
     const resultImg = this.props.image;
 
     const renderCameraFlip = () => {
@@ -216,13 +217,13 @@ class SceneCamera extends React.Component {
                 }
               })()}
             </Animated.View>
-            <View style={{height: window.height}}
+            <View style={{height: this.state.overlay ? this.state.cameraHeight : 0}}
               {...this.panResponder.panHandlers}>
               <TouchableWithoutFeedback>
                 <View style={{flex: 1 }}>
                 {resultImg && <Image 
                   source={{uri: resultImg}} 
-                  style={[styles.overlayImage, {height: this.state.overlay ? window.height : 0, opacity: this.state.overlayOpacity},]}
+                  style={[styles.overlayImage, {height: this.state.overlay ? this.state.cameraHeight : 0, opacity: this.state.overlayOpacity},]}
                   />
                 }
                 <Grid size={5} width={this.state.grid ? 2 : 0} color="rgba(255, 255, 255, 0.5)"/>
