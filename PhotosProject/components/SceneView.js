@@ -9,22 +9,94 @@ import { connect } from 'react-redux';
 
 import * as Actions from '../actions'; //Import your actions
 import SceneCamera from './SceneCamera';
+import RoundButton from './RoundButton';
 
 const window = Dimensions.get('window');
 
 class SceneView extends React.Component {
     state = {
-        cameraVisible: false
+        cameraVisible: false,
+        longPressed: [],
+        showDelete: false
     }
+
+    static navigationOptions = {
+        title: 'scene',
+        headerRight: (<View />),
+    };
 
     closeCamera() {
         this.setState({cameraVisible: false});
     }
 
+    onLongPressImage(index) {
+        let showDelete = false;
+
+        this.selectImages(index);
+        let {longPressed} = this.state;
+
+        for(let i = 0; i < longPressed.length; i++) {
+            if(longPressed[i]) {
+                showDelete = true;
+            }
+        }
+
+        this.setState({showDelete});
+    }
+
+    onPressImage(index) {
+        let showDelete = false;
+
+        if(this.state.showDelete) {
+            this.selectImages(index);
+        }
+
+        let {longPressed} = this.state;
+
+        for(let i = 0; i < longPressed.length; i++) {
+            if(longPressed[i]) {
+                showDelete = true;
+            }
+        }
+
+        this.setState({showDelete});
+    }
+
+    selectImages(index) {
+        let {longPressed} = this.state;
+
+        if(longPressed[index] != true) {
+            longPressed[index] = true;
+            this.setState({longPressed});
+        } else {
+            longPressed[index] = false;
+            this.setState({longPressed});
+        }
+    }
+
+    deletePhotos() {
+        const sceneId = this.props.navigation.state.params.sceneId;
+        const {longPressed} = this.state;
+        const data = this.props.scenes[sceneId].photoIds.slice().reverse();
+
+        for(let i = 0; i < longPressed.length; i++) {
+            if(longPressed[i]) {
+                const photoId = data[i];
+                this.props.deletePhoto(photoId, sceneId);
+                longPressed[i] = false;
+                this.setState({longPressed});
+            }
+        }
+
+        this.setState({showDelete: false});
+    }
+
     render() {
         const sceneId = this.props.navigation.state.params.sceneId;
         const data = this.props.scenes[sceneId].photoIds;
-        const overlayPhotoId = this.props.scenes[sceneId].photoIds[0];
+        const photoIds = this.props.scenes[sceneId].photoIds;
+        const overlayPhotoId = photoIds[photoIds.length - 1];
+        const {longPressed} = this.state;
 
         return (
             <View style={styles.container}>
@@ -33,22 +105,39 @@ class SceneView extends React.Component {
                     transparent={false}
                     visible={this.state.cameraVisible}
                     onRequestClose={this.closeCamera.bind(this)}>
-                    <SceneCamera sceneId={sceneId} image={this.props.photos[overlayPhotoId].url} close={this.closeCamera.bind(this)} />
+                    <SceneCamera sceneId={sceneId} image={photoIds.length > 0 ? this.props.photos[overlayPhotoId].url : null} close={this.closeCamera.bind(this)} />
                 </Modal>
 
                 <ScrollView style={styles.scrollView} >
                     <View style={styles.imageContainer}>
                     {
-                        data.map((photoId) => {
+                        data.slice().reverse().map((photoId, index) => {
                             return (
-                                <View style={styles.imageWrap} key={photoId}>
-                                    <Image source={{uri: this.props.photos[photoId].url}} style={{flex: 1}} />
-                                </View>
+                                <TouchableOpacity 
+                                    style={styles.imageWrap} 
+                                    key={photoId} 
+                                    onLongPress={() => this.onLongPressImage(index)}
+                                    onPress={() => this.onPressImage(index)}>
+                                    <Image source={{uri: this.props.photos[photoId].url}} style={{flex: 1, opacity: longPressed[index] ? 0.5 : 1}} />
+                                </TouchableOpacity>
                             )
                         })
                     }
                     </View>
                 </ScrollView>
+                {(() => {
+                    if(this.state.showDelete) {
+                        return(
+                            <RoundButton 
+                            icon="delete" 
+                            color="#f93943" 
+                            iconColor="#fff"
+                            bottom={70}
+                            right={15}
+                            onPress={this.deletePhotos.bind(this)} />
+                        )
+                    }
+                })()}
                 <BottomBar onPress={() => this.setState({cameraVisible: true})} />
             </View>
         )

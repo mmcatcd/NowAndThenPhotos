@@ -13,6 +13,14 @@ export const createPhoto = (url, sceneId) => ({
     sceneId
 })
 
+export const DELETE_PHOTO = 'DELETE_PHOTO'
+
+export const deletePhoto = (photoId, sceneId) => ({
+    type: DELETE_PHOTO,
+    photoId,
+    sceneId
+})
+
 export const ADD_LOCATION = 'ADD_LOCATION'
 
 export const addLocation = (location, sceneId) => ({
