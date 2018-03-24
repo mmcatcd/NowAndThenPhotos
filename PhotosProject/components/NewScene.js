@@ -7,8 +7,7 @@ import {
     Alert, 
     TextInput, 
     Modal, 
-    Platform, 
-    KeyboardAvoidingView, 
+    Platform,
     Keyboard,
     StatusBar,
     TouchableOpacity,
@@ -289,14 +288,7 @@ class NewScene extends React.Component {
             return <View />
 
         return(
-            <View style={[styles.container, {marginTop: keyboard.textFocused ? -keyboard.height : 0}]}>
-                {/*<Modal
-                    animationType='slide'
-                    transparent={false}
-                    visible={this.state.cameraVisible}
-                    onRequestClose={this.closeModal.bind(this)}>
-                    <NewPhoto onExit={this.closeModal.bind(this)} imageUpdate={this.updateImage.bind(this)} />
-                </Modal>*/}
+            <View style={[styles.container, {transform: [{translateY: keyboard.textFocused ? -keyboard.height : 0}]}]}>
                 {Modal()}
                 <NavigationBar 
                     title={navBarConfig.title} 
