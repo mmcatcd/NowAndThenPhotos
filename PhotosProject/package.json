@@ -21,6 +21,7 @@
   "dependencies": {
     "d3-scale": "^2.0.0",
     "expo": "^25.0.0",
+    "npm": "^5.7.1",
     "react": "16.2.0",
     "react-native": "0.52.0",
     "react-native-camera": "^0.13.0",
