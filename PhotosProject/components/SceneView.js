@@ -18,6 +18,9 @@ import {
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 import {Camera, Permissions, Constants} from 'expo';
 import {StackNavigator} from 'react-navigation';
+import ImageViewer from 'react-native-image-zoom-viewer';
+import NavBar from './NavBar';
+import Timelapse from './Timelapse';
 
 //Redux imports
 import {bindActionCreators} from 'redux';
@@ -38,6 +41,11 @@ class SceneView extends React.Component {
         location: null,
         type: null,
         position: new Animated.Value(window.height),
+        imagePreview: {
+            visible: false,
+            index: 0
+        },
+        showTimelapse: false
     }
 
     static navigationOptions = ({navigation}) => ({
@@ -77,6 +85,14 @@ class SceneView extends React.Component {
         this.props.navigation.setParams({header: undefined});
     }
 
+    showTimelapse() {
+        this.setState({showTimelapse: true});
+    }
+
+    closeTimelapse() {
+        this.setState({showTimelapse: false});
+    }
+
     onLongPressImage(index) {
         let showDelete = false;
 
@@ -97,17 +113,24 @@ class SceneView extends React.Component {
 
         if(this.state.showDelete) {
             this.selectImages(index);
-        }
 
-        let {longPressed} = this.state;
+            let {longPressed} = this.state;
 
-        for(let i = 0; i < longPressed.length; i++) {
-            if(longPressed[i]) {
-                showDelete = true;
+            for(let i = 0; i < longPressed.length; i++) {
+                if(longPressed[i]) {
+                    showDelete = true;
+                }
             }
-        }
 
-        this.setState({showDelete});
+            this.setState({showDelete});
+        } else {
+            this.setState({
+                imagePreview: {
+                    visible: true,
+                    index
+                }
+            })
+        }
     }
 
     imagesSelected(longPressed) {
@@ -169,15 +192,24 @@ class SceneView extends React.Component {
         const data = this.props.scenes[sceneId].photoIds;
         const photoIds = this.props.scenes[sceneId].photoIds;
         const overlayPhotoId = photoIds[photoIds.length - 1];
-        const {longPressed} = this.state;
+        const {longPressed, imagePreview, showTimelapse} = this.state;
+
+        const dataIn = data.slice().reverse();
+        let images = [];
+        dataIn.map((photoId, index) => {
+            const newImage = {
+                url: this.props.photos[photoId].url
+            }
+            images[index] = newImage;
+        });
 
         const camera = () => {
             return(
                 <Animated.View style={{position: 'absolute', width: window.width, height: window.height, zIndex: 100000, transform: [{translateY: this.state.position }]}}>
-                <SceneCamera 
-                    takePhoto={this.closeCamera.bind(this)} 
-                    sceneId={sceneId} image={photoIds.length > 0 ? this.props.photos[overlayPhotoId].url : null} 
-                    close={this.closeCamera.bind(this)} />
+                    <SceneCamera 
+                        takePhoto={this.closeCamera.bind(this)} 
+                        sceneId={sceneId} image={photoIds.length > 0 ? this.props.photos[overlayPhotoId].url : null} 
+                        close={this.closeCamera.bind(this)} />
                 </Animated.View>
             )
         }
@@ -190,8 +222,22 @@ class SceneView extends React.Component {
         } else {
             return (
                 <View style={styles.container}>
+                    <Modal
+                        visible={imagePreview.visible} 
+                        transparent={true}
+                        animationType="slide"
+                        onRequestClose={this.closeTimelapse.bind(this)}>
+                        <NavBar close={this.closeTimelapse.bind(this)} title="preview" />
+                        <ImageViewer imageUrls={images} index={imagePreview.index} />
+                    </Modal>
+                    <Modal
+                        visible={showTimelapse}
+                        animationType="slide"
+                        transparent={true}
+                        onRequestClose={() => this.setState({showTimelapse: false})}>
+                        <Timelapse close={() => this.setState({showTimelapse: false})} />
+                    </Modal>
                     {camera()}
-
                     <ScrollView style={styles.scrollView} >
                         <View style={styles.imageContainer}>
                         {
@@ -223,7 +269,8 @@ class SceneView extends React.Component {
                         }
                     })()}
                     <BottomBar 
-                        onPress={this.showCamera.bind(this)} />
+                        onPressCamera={this.showCamera.bind(this)}
+                        onPressPlay={this.showTimelapse.bind(this)} />
                 </View>
             )
         }
@@ -254,14 +301,16 @@ const styles = StyleSheet.create({
     },
 })
 
-const BottomBar = ({onPress}) => {
+const BottomBar = ({onPressCamera, onPressPlay}) => {
     return(
         <View style={bottomBarStyles.container}>
             <MaterialCommunityIcons name='settings' size={28} color='#fff' />
-            <TouchableOpacity onPress={onPress}>
+            <TouchableOpacity onPress={onPressCamera}>
                 <MaterialCommunityIcons name='camera' size={28} color='#fff' />
             </TouchableOpacity>
-            <MaterialCommunityIcons name='play' size={28} color='#fff' />
+            <TouchableOpacity onPress={onPressPlay}>
+                <MaterialCommunityIcons name='play' size={28} color='#fff' />
+            </TouchableOpacity>
         </View>
     )
 }
@@ -272,7 +321,8 @@ const bottomBarStyles = StyleSheet.create({
         backgroundColor: '#F93943',
         flexDirection: 'row',
         justifyContent: 'space-around',
-        alignItems: 'center'
+        alignItems: 'center',
+        zIndex: 11
     }
 });
 
