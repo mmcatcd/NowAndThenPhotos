@@ -57,7 +57,7 @@ class SceneView extends React.Component {
             {
                 toValue: 0,
                 duration: 100,
-                easing: Easing.quad,
+                easing: Easing.linear,
                 useNativeDriver: true
             }
         ).start();
@@ -70,7 +70,7 @@ class SceneView extends React.Component {
             {
                 toValue: window.height,
                 duration: 100,
-                easing: Easing.quad,
+                easing: Easing.linear,
                 useNativeDriver: true
             }
         ).start();

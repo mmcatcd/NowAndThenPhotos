@@ -20,6 +20,7 @@ import {scaleLinear} from 'd3-scale';
 
 import {MaterialCommunityIcons, Ionicons} from '@expo/vector-icons';
 import Grid from './Grid';
+import {getDistance} from './distance';
 
 import {bindActionCreators} from 'redux';
 import { connect } from 'react-redux';
@@ -53,7 +54,8 @@ class SceneCamera extends React.Component {
     errorMessage: null,
     cameraHeight: null,
     overlayOpacity: 0.5,
-    position: 0
+    position: 0,
+    distance: null
   }
 
   static navigationOptions = {
@@ -94,13 +96,19 @@ class SceneCamera extends React.Component {
     const {status} = await Permissions.askAsync(Permissions.CAMERA);
     this.setState({ hasCameraPermission: status === 'granted' });
 
+    const sceneId = this.props.sceneId;
+    const sceneLocation = this.props.scenes[sceneId].location;
+
     Location.watchPositionAsync(GEOLOCATION_OPTIONS, (newLoc) => {
+      const newLocation = {
+        latitude: newLoc.coords.latitude,
+        longitude: newLoc.coords.longitude,
+        altitude: newLoc.coords.altitude
+      }
+
       this.setState({
-        location: {
-          latitude: newLoc.coords.latitude,
-          longitude: newLoc.coords.longitude,
-          altitude: newLoc.coords.altitude
-        }
+        location: newLocation,
+        distance: getDistance(sceneLocation, newLocation)
       });
     }).then(watcher => this.removeLocationWatcher = watcher.remove);
   }
@@ -138,7 +146,7 @@ class SceneCamera extends React.Component {
         toValue: this.state.optionsPressed ? 5 : 30,
         duration: 100,
         easing: Easing.quad,
-        useNativeDriver: true
+        useNativeDriver: false
       }
     ).start();
 
@@ -162,6 +170,7 @@ class SceneCamera extends React.Component {
 
   render() {
     let longLat = this.state.location;
+    let distance = this.state.distance;
     let {optionsHeight} = this.state;
     const resultImg = this.props.image;
 
@@ -210,8 +219,9 @@ class SceneCamera extends React.Component {
                           }
                         })()}
                       </TouchableOpacity>
-                      <Text>Long: {longLat.longitude}</Text>
-                      <Text>Lat: {longLat.latitude}</Text>
+                      {/*<Text>Long: {longLat.longitude}</Text>
+                      <Text>Lat: {longLat.latitude}</Text>*/}
+                      <Text style={styles.locationText}>{parseInt(distance)} metres away</Text>
                     </View>
                   )
                 }
@@ -309,6 +319,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: window.width,
     top: 0
+  },
+  locationText: {
+    color: '#fff',
+    paddingLeft: 5
   }
 });
 
