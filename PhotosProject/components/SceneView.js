@@ -1,7 +1,23 @@
 import React from 'react';
 
-import {View, Text, StyleSheet, ScrollView, ListView, Image, Dimensions, Modal, TouchableOpacity} from 'react-native';
+import {
+    View, 
+    Text, 
+    StyleSheet, 
+    ScrollView, 
+    ListView, 
+    Image, 
+    Dimensions, 
+    TouchableOpacity, 
+    Alert, 
+    CameraRoll, 
+    Animated, 
+    Modal,
+    Easing
+} from 'react-native';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
+import {Camera, Permissions, Constants} from 'expo';
+import {StackNavigator} from 'react-navigation';
 
 //Redux imports
 import {bindActionCreators} from 'redux';
@@ -12,21 +28,53 @@ import SceneCamera from './SceneCamera';
 import RoundButton from './RoundButton';
 
 const window = Dimensions.get('window');
+let header = false;
 
 class SceneView extends React.Component {
     state = {
-        cameraVisible: false,
+        hasCameraPermission: null,
         longPressed: [],
-        showDelete: false
+        showDelete: false,
+        location: null,
+        type: null,
+        position: new Animated.Value(window.height),
     }
 
-    static navigationOptions = {
+    static navigationOptions = ({navigation}) => ({
+        header: navigation.state.params ? navigation.state.params.header : undefined,
         title: 'scene',
         headerRight: (<View />),
-    };
+    });
+
+    async componentWillMount() {
+        const {status} = await Permissions.askAsync(Permissions.CAMERA);
+        this.setState({ hasCameraPermission: status === 'granted' });
+    }
+
+    showCamera() {
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: 0,
+                duration: 100,
+                easing: Easing.quad,
+                useNativeDriver: true
+            }
+        ).start();
+        this.props.navigation.setParams({header: null});
+    }
 
     closeCamera() {
-        this.setState({cameraVisible: false});
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: window.height,
+                duration: 100,
+                easing: Easing.quad,
+                useNativeDriver: true
+            }
+        ).start();
+        this.props.navigation.setParams({header: undefined});
     }
 
     onLongPressImage(index) {
@@ -62,6 +110,17 @@ class SceneView extends React.Component {
         this.setState({showDelete});
     }
 
+    imagesSelected(longPressed) {
+        let selected = 0;
+        for (let i = 0; i < longPressed.length; i++) {
+            if(longPressed[i]) {
+                selected++;
+            }
+        }
+
+        return selected;
+    }
+
     selectImages(index) {
         let {longPressed} = this.state;
 
@@ -79,13 +138,27 @@ class SceneView extends React.Component {
         const {longPressed} = this.state;
         const data = this.props.scenes[sceneId].photoIds.slice().reverse();
 
-        for(let i = 0; i < longPressed.length; i++) {
-            if(longPressed[i]) {
-                const photoId = data[i];
-                this.props.deletePhoto(photoId, sceneId);
-                longPressed[i] = false;
-                this.setState({longPressed});
+        if(this.imagesSelected(longPressed) !== data.length) {
+            for(let i = 0; i < longPressed.length; i++) {
+                if(longPressed[i]) {
+                    const photoId = data[i];
+                    this.props.deletePhoto(photoId, sceneId);
+                    longPressed[i] = false;
+                    this.setState({longPressed});
+                }
             }
+        } else {
+            for(let i = 0; i < longPressed.length; i++) {
+                longPressed[i] = false;
+            }
+
+            Alert.alert(
+                'Too many images selected',
+                'Please try again!',
+                [
+                    {text: 'OK'}
+                ]
+            )
         }
 
         this.setState({showDelete: false});
@@ -98,56 +171,69 @@ class SceneView extends React.Component {
         const overlayPhotoId = photoIds[photoIds.length - 1];
         const {longPressed} = this.state;
 
-        return (
-            <View style={styles.container}>
-                <Modal
-                    animationType="slide"
-                    transparent={false}
-                    visible={this.state.cameraVisible}
-                    onRequestClose={this.closeCamera.bind(this)}>
-                    <SceneCamera sceneId={sceneId} image={photoIds.length > 0 ? this.props.photos[overlayPhotoId].url : null} close={this.closeCamera.bind(this)} />
-                </Modal>
+        const camera = () => {
+            return(
+                <Animated.View style={{position: 'absolute', width: window.width, height: window.height, zIndex: 100000, transform: [{translateY: this.state.position }]}}>
+                <SceneCamera 
+                    takePhoto={this.closeCamera.bind(this)} 
+                    sceneId={sceneId} image={photoIds.length > 0 ? this.props.photos[overlayPhotoId].url : null} 
+                    close={this.closeCamera.bind(this)} />
+                </Animated.View>
+            )
+        }
 
-                <ScrollView style={styles.scrollView} >
-                    <View style={styles.imageContainer}>
-                    {
-                        data.slice().reverse().map((photoId, index) => {
-                            return (
-                                <TouchableOpacity 
-                                    style={styles.imageWrap} 
-                                    key={photoId} 
-                                    onLongPress={() => this.onLongPressImage(index)}
-                                    onPress={() => this.onPressImage(index)}>
-                                    <Image source={{uri: this.props.photos[photoId].url}} style={{flex: 1, opacity: longPressed[index] ? 0.5 : 1}} />
-                                </TouchableOpacity>
+        const {hasCameraPermission} = this.state;
+        if(hasCameraPermission === null) {
+            return <View />;
+        } else if(hasCameraPermission === false) {
+            return <Text>No access to camera</Text>;
+        } else {
+            return (
+                <View style={styles.container}>
+                    {camera()}
+
+                    <ScrollView style={styles.scrollView} >
+                        <View style={styles.imageContainer}>
+                        {
+                            data.slice().reverse().map((photoId, index) => {
+                                return (
+                                    <TouchableOpacity 
+                                        style={styles.imageWrap} 
+                                        key={photoId} 
+                                        onLongPress={() => this.onLongPressImage(index)}
+                                        onPress={() => this.onPressImage(index)}>
+                                        <Image source={{uri: this.props.photos[photoId].url}} style={{flex: 1, opacity: longPressed[index] ? 0.5 : 1}} />
+                                    </TouchableOpacity>
+                                )
+                            })
+                        }
+                        </View>
+                    </ScrollView>
+                    {(() => {
+                        if(this.state.showDelete) {
+                            return(
+                                <RoundButton 
+                                icon="delete" 
+                                color="#f93943" 
+                                iconColor="#fff"
+                                bottom={70}
+                                right={15}
+                                onPress={this.deletePhotos.bind(this)} />
                             )
-                        })
-                    }
-                    </View>
-                </ScrollView>
-                {(() => {
-                    if(this.state.showDelete) {
-                        return(
-                            <RoundButton 
-                            icon="delete" 
-                            color="#f93943" 
-                            iconColor="#fff"
-                            bottom={70}
-                            right={15}
-                            onPress={this.deletePhotos.bind(this)} />
-                        )
-                    }
-                })()}
-                <BottomBar onPress={() => this.setState({cameraVisible: true})} />
-            </View>
-        )
+                        }
+                    })()}
+                    <BottomBar 
+                        onPress={this.showCamera.bind(this)} />
+                </View>
+            )
+        }
     }
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff'
+        backgroundColor: '#fff',
     },
     scrollView: {
         backgroundColor: '#fff'
@@ -162,7 +248,10 @@ const styles = StyleSheet.create({
         height: window.width/3,
         width: window.width/3,
         padding: 2,
-    }
+    },
+    cameraContainer: {
+        height: 10,
+    },
 })
 
 const BottomBar = ({onPress}) => {

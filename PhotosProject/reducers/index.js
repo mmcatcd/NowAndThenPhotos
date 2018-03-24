@@ -35,14 +35,10 @@ const sceneReducer = (state = initialState, action) => {
             scenePhotos = [...state.scenes[action.sceneId].photoIds];
             updatedPhotoIds = scenePhotos.filter(item => item !== action.photoId);
             updatedScene = {...state.scenes[action.sceneId], photoIds: updatedPhotoIds};
-
-            photos = {...state.photos};
-            delete photos[action.photoId];
             
             state = {
                 ...state,
-                scenes: {...state.scenes, [action.sceneId]: updatedScene},
-                photos
+                scenes: {...state.scenes, [action.sceneId]: updatedScene}
             }
             return state;
         case ADD_LOCATION:

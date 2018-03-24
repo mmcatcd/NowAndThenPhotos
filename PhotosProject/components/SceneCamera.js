@@ -52,7 +52,8 @@ class SceneCamera extends React.Component {
     grid: false,
     errorMessage: null,
     cameraHeight: null,
-    overlayOpacity: 0.5
+    overlayOpacity: 0.5,
+    position: 0
   }
 
   static navigationOptions = {
@@ -104,20 +105,21 @@ class SceneCamera extends React.Component {
     }).then(watcher => this.removeLocationWatcher = watcher.remove);
   }
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
     this.removeLocationWatcher && this.removeLocationWatcher();
   }
 
-  takePhoto = async () => {
+  handlePhoto = async () => {
     Vibration.vibrate();
+    this.props.takePhoto();
     if (this.camera) {
-      let photo = await this.camera.takePictureAsync()
-      let savedUri = await CameraRoll.saveToCameraRoll(photo.uri)
-      //let sceneId = this.props.screenProps.sceneId
-      let sceneId = this.props.sceneId;
-      
-      this.props.createPhoto(savedUri, sceneId)
-      this.props.close();
+      let photo = await this.camera.takePictureAsync();
+      let savedUri = await CameraRoll.saveToCameraRoll(photo.uri);
+      const sceneId = this.props.sceneId;
+
+      this.props.createPhoto(savedUri, sceneId);
+    } else {
+      console.log('No camera :-(');
     }
   }
 
@@ -135,7 +137,8 @@ class SceneCamera extends React.Component {
       {
         toValue: this.state.optionsPressed ? 5 : 30,
         duration: 100,
-        easing: Easing.quad
+        easing: Easing.quad,
+        useNativeDriver: true
       }
     ).start();
 
@@ -158,7 +161,6 @@ class SceneCamera extends React.Component {
   }
 
   render() {
-    console.log(this.state.animatedOpacity);
     let longLat = this.state.location;
     let {optionsHeight} = this.state;
     const resultImg = this.props.image;
@@ -178,11 +180,9 @@ class SceneCamera extends React.Component {
       return <Text>No access to camera</Text>;
     } else {
       return(
-        <View style={styles.container}>
+        <View style={[styles.container]}>
           <Camera
-            ref={ref => {
-              this.camera = ref;
-            }}
+            ref={ref => {this.camera = ref;}}
             style={styles.cameraContainer}
             type={this.state.type}
             onLayout={(event) => this.setState({cameraHeight: event.nativeEvent.layout.height})}
@@ -239,7 +239,7 @@ class SceneCamera extends React.Component {
                 </TouchableOpacity>
               </View>
               <View style={styles.controlsView}>
-                <TouchableOpacity onPress={this.takePhoto.bind(this)}>
+                <TouchableOpacity onPress={this.handlePhoto.bind(this)}>
                   <Ionicons name="ios-radio-button-on-outline" size={100} color="#F93943" />
                 </TouchableOpacity>
               </View>
@@ -261,7 +261,7 @@ class SceneCamera extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
   },
   cameraContainer: {
     flex: 4,
