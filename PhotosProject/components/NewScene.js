@@ -11,7 +11,9 @@ import {
     KeyboardAvoidingView, 
     Keyboard,
     StatusBar,
-    TouchableOpacity
+    TouchableOpacity,
+    Animated,
+    Easing
 } from 'react-native';
 import {ImagePicker, Location, Permissions, MapView, Constants} from 'expo';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
@@ -51,7 +53,6 @@ class NewScene extends React.Component {
         image: null,
         name: null,
         nameFocus: false,
-        cameraVisible: false,
         location: {
             latitude: 0,
             longitude: 0,
@@ -68,6 +69,7 @@ class NewScene extends React.Component {
             height: 0,
             textFocused: false
         },
+        position: new Animated.Value(window.height),
     }
 
     static navigationOptions = {
@@ -243,8 +245,28 @@ class NewScene extends React.Component {
         });
     };
 
+    openModal() {
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: 0,
+                duration: 100,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        ).start();
+    }
+
     closeModal() {
-        this.setState({cameraVisible: false});
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: window.height,
+                duration: 100,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        ).start();
     }
 
     updateImage(image) {
@@ -255,18 +277,27 @@ class NewScene extends React.Component {
         const location = this.state.location;
         const keyboard = this.state.keyboard;
 
+        const Modal = () => {
+            return(
+                <Animated.View style={{position: 'absolute', width: window.width, height: window.height, zIndex: 100000, transform: [{translateY: this.state.position }]}}>
+                    <NewPhoto onExit={this.closeModal.bind(this)} imageUpdate={this.updateImage.bind(this)} />
+                </Animated.View>
+            )
+        }
+
         if(location.latitude == 0)
             return <View />
 
         return(
             <View style={[styles.container, {marginTop: keyboard.textFocused ? -keyboard.height : 0}]}>
-                <Modal
+                {/*<Modal
                     animationType='slide'
                     transparent={false}
                     visible={this.state.cameraVisible}
                     onRequestClose={this.closeModal.bind(this)}>
                     <NewPhoto onExit={this.closeModal.bind(this)} imageUpdate={this.updateImage.bind(this)} />
-                </Modal>
+                </Modal>*/}
+                {Modal()}
                 <NavigationBar 
                     title={navBarConfig.title} 
                     tintColor={navBarConfig.tintColor} 
@@ -293,7 +324,7 @@ class NewScene extends React.Component {
                             placeholder="Scene Name" />
                     </View>
                     <View style={styles.buttonContainer}>
-                        <SourceButton text="Take Photo" icon="camera" color="#F93943" onPress={() => this.setState({cameraVisible: true})} />
+                        <SourceButton text="Take Photo" icon="camera" color="#F93943" onPress={this.openModal.bind(this)} />
                         <SourceButton text="Camera Roll" icon="image" backgroundColor="#F93943" color="#fff" onPress={this.pickImage} />
                     </View>
                     <View style={styles.mapContainer}>
