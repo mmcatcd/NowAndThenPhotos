@@ -64,7 +64,6 @@ class SceneList extends React.Component {
                             title={item.name}
                             subtitle={item.id}
                             onPress={() => {
-                                console.log("Scene ID for link ", item.id)
                                 return this.props.navigation.navigate('SceneView', {sceneId: item.id})
                             }}
                         />
