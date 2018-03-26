@@ -93,6 +93,15 @@ class SceneView extends React.Component {
         this.setState({showTimelapse: false});
     }
 
+    closePreview() {
+        this.setState({
+            imagePreview: {
+                visible: false,
+                index: 0
+            }
+        });
+    }
+
     onLongPressImage(index) {
         let showDelete = false;
 
@@ -226,8 +235,8 @@ class SceneView extends React.Component {
                         visible={imagePreview.visible} 
                         transparent={true}
                         animationType="slide"
-                        onRequestClose={this.closeTimelapse.bind(this)}>
-                        <NavBar close={this.closeTimelapse.bind(this)} title="preview" />
+                        onRequestClose={this.closePreview.bind(this)}>
+                        <NavBar close={this.closePreview.bind(this)} title="preview" />
                         <ImageViewer imageUrls={images} index={imagePreview.index} />
                     </Modal>
                     <Modal
