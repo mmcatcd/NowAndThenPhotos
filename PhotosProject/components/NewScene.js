@@ -12,9 +12,9 @@ import {
     Keyboard,
     StatusBar,
     TouchableOpacity,
-    ScrollView
-    
-
+    ScrollView,
+    Animated,
+    Easing
 } from 'react-native';
 import {ImagePicker, Location, Permissions, MapView, Constants} from 'expo';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
@@ -55,7 +55,7 @@ class NewScene extends React.Component {
         image: null,
         name: null,
         nameFocus: false,
-        cameraVisible: false,
+        position: new Animated.Value(window.height),
         location: {
             latitude: 0,
             longitude: 0,
@@ -202,7 +202,6 @@ class NewScene extends React.Component {
             await this.props.createPhoto(image, id);
             await this.props.addLocation(location, id);
 
-            //this.props.navigation.navigate('SceneView', {sceneId: id});
             this.props.sceneCreated(id);
         } else if (image == null) {
             Alert.alert(
@@ -241,8 +240,28 @@ class NewScene extends React.Component {
         });
     };
 
-    closeModal() {
-        this.setState({cameraVisible: false});
+    showCamera() {
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: 0,
+                duration: 100,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        ).start();
+    }
+
+    closeCamera() {
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: window.height,
+                duration: 100,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        ).start();
     }
 
     updateImage(image) {
@@ -261,17 +280,19 @@ class NewScene extends React.Component {
         if(location.latitude == 0)
             return <View />
 
+        const camera = () => {
+            return(
+                <Animated.View style={{position: 'absolute', width: window.width, height: window.height, zIndex: 100000, transform: [{translateY: this.state.position }]}}>
+                    <NewPhoto onExit={this.closeCamera.bind(this)} imageUpdate={this.updateImage.bind(this)} />
+                </Animated.View>
+            )
+        }
+
         return(
            <View style={[styles.container]}>
+           {camera()}
             <ScrollView>
                 <KeyboardAwareScrollView>
-                    <Modal
-                        animationType='fade'
-                        transparent={false}
-                        visible={this.state.cameraVisible}
-                        onRequestClose={this.closeModal.bind(this)}>
-                        <NewPhoto onExit={this.closeModal.bind(this)} imageUpdate={this.updateImage.bind(this)} />
-                    </Modal>
                     <NavigationBar 
                         title={navBarConfig.title} 
                         tintColor={navBarConfig.tintColor} 
@@ -300,7 +321,7 @@ class NewScene extends React.Component {
                         </View>
                         
                         <View style={styles.buttonContainer}>
-                            <SourceButton text="Take Photo" icon="camera" color="#F93943" onPress={() => this.setState({cameraVisible: true})} />
+                            <SourceButton text="Take Photo" icon="camera" color="#F93943" onPress={this.showCamera.bind(this)} />
                             <SourceButton text="Camera Roll" icon="image" backgroundColor="#F93943" color="#fff" onPress={this.pickImage} />
                         </View>
                         <View style={styles.mapContainer}>
