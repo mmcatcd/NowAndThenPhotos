@@ -11,7 +11,10 @@ import {
     KeyboardAvoidingView, 
     Keyboard,
     StatusBar,
-    TouchableOpacity
+    TouchableOpacity,
+    ScrollView,
+    Animated,
+    Easing
 } from 'react-native';
 import {ImagePicker, Location, Permissions, MapView, Constants} from 'expo';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
@@ -21,6 +24,7 @@ import SourceButton from './SourceButton';
 import Dimensions from 'Dimensions';
 import NewPhoto from './NewPhoto';
 import t from 'tcomb-form-native';
+import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 
 const Form = t.form.Form;
 
@@ -51,7 +55,7 @@ class NewScene extends React.Component {
         image: null,
         name: null,
         nameFocus: false,
-        cameraVisible: false,
+        position: new Animated.Value(window.height),
         location: {
             latitude: 0,
             longitude: 0,
@@ -198,7 +202,6 @@ class NewScene extends React.Component {
             await this.props.createPhoto(image, id);
             await this.props.addLocation(location, id);
 
-            //this.props.navigation.navigate('SceneView', {sceneId: id});
             this.props.sceneCreated(id);
         } else if (image == null) {
             Alert.alert(
@@ -237,13 +240,38 @@ class NewScene extends React.Component {
         });
     };
 
-    closeModal() {
-        this.setState({cameraVisible: false});
+    showCamera() {
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: 0,
+                duration: 100,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        ).start();
+    }
+
+    closeCamera() {
+        Animated.timing(
+            this.state.position,
+            {
+                toValue: window.height,
+                duration: 100,
+                easing: Easing.linear,
+                useNativeDriver: true
+            }
+        ).start();
     }
 
     updateImage(image) {
         this.setState({image});
     }
+
+    _scrollToInput (reactNode) {
+        
+        this.scroll.scrollToFocusedInput(reactNode)
+      }
 
     render() {
         const location = this.state.location;
@@ -252,81 +280,91 @@ class NewScene extends React.Component {
         if(location.latitude == 0)
             return <View />
 
+        const camera = () => {
+            return(
+                <Animated.View style={{position: 'absolute', width: window.width, height: window.height, zIndex: 100000, transform: [{translateY: this.state.position }]}}>
+                    <NewPhoto onExit={this.closeCamera.bind(this)} imageUpdate={this.updateImage.bind(this)} />
+                </Animated.View>
+            )
+        }
+
         return(
-            <View style={[styles.container, {marginTop: keyboard.textFocused ? -keyboard.height : 0}]}>
-                <Modal
-                    animationType='fade'
-                    transparent={false}
-                    visible={this.state.cameraVisible}
-                    onRequestClose={this.closeModal.bind(this)}>
-                    <NewPhoto onExit={this.closeModal.bind(this)} imageUpdate={this.updateImage.bind(this)} />
-                </Modal>
-                <NavigationBar 
-                    title={navBarConfig.title} 
-                    tintColor={navBarConfig.tintColor} 
-                    containerStyle={navBarConfig.containerStyle}
-                    leftButton={
-                        <TouchableOpacity
-                            onPress={() => this.props.close()}>
-                            <View style={{paddingLeft: 10, paddingTop: 8}}>
-                                <MaterialCommunityIcons name="close" size={28} color="#fff" />
-                            </View>
-                        </TouchableOpacity>
-                    } />
-                <View style={styles.container}>
-                    <View style={styles.formContainer}>
-                        <TextInput
-                            style={styles.textInput}
-                            onChangeText={name => this.setState({name})}
-                            underlineColorAndroid="transparent"
-                            selectionColor="#f93943"
-                            value={this.state.text}
-                            maxLength={30}
-                            onFocus={() => this.setState({nameFocus: true})}
-                            onBlur={() => this.setState({nameFocus: false})}
-                            placeholder="Scene Name" />
-                    </View>
-                    <View style={styles.buttonContainer}>
-                        <SourceButton text="Take Photo" icon="camera" color="#F93943" onPress={() => this.setState({cameraVisible: true})} />
-                        <SourceButton text="Camera Roll" icon="image" backgroundColor="#F93943" color="#fff" onPress={this.pickImage} />
-                    </View>
-                    <View style={styles.mapContainer}>
-                        <MapView
-                            style={styles.map}
-                            showsMyLocationButton={true}
-                            showsUserLocation={true}
-                            region={{
-                                latitude: location.latitude,
-                                longitude: location.longitude,
-                                latitudeDelta: 0.0922, 
-                                longitudeDelta: 0.0421
-                            }}
-                        >
-                            <MapView.Marker 
-                                coordinate={{
-                                    latitude: location.latitude,
-                                    longitude: location.longitude
-                                }} 
-                            />
-                        </MapView>
-                        <View style={[styles.formContainer, {flex: 1}]}>
+           <View style={[styles.container]}>
+           {camera()}
+            <ScrollView>
+                <KeyboardAwareScrollView>
+                    <NavigationBar 
+                        title={navBarConfig.title} 
+                        tintColor={navBarConfig.tintColor} 
+                        containerStyle={navBarConfig.containerStyle}
+                        leftButton={
+                            <TouchableOpacity
+                                onPress={() => this.props.close()}>
+                                <View style={{paddingLeft: 10, paddingTop: 8}}>
+                                    <MaterialCommunityIcons name="close" size={28} color="#fff" />
+                                </View>
+                            </TouchableOpacity>
+                        } />
+                    <View style={styles.container}>
+                
+                        <View style={styles.formContainer}>
                             <TextInput
                                 style={styles.textInput}
-                                onChangeText={text => this.setState({searchText: text})}
+                                onChangeText={name => this.setState({name})}
                                 underlineColorAndroid="transparent"
                                 selectionColor="#f93943"
-                                value={this.state.searchText}
-                                placeholder="Current Location"
-                                onSubmitEditing={this._attemptGeocodeAsync}
-                                onFocus={this.focusLocationText.bind(this)}
-                                onBlur={this.unFocusLocationText.bind(this)}
+                                value={this.state.text}
+                                maxLength={30}
+                                onFocus={() => this.setState({nameFocus: true})}
+                                onBlur={() => this.setState({nameFocus: false})}
+                                placeholder="Scene Name" />
+                        </View>
+                        
+                        <View style={styles.buttonContainer}>
+                            <SourceButton text="Take Photo" icon="camera" color="#F93943" onPress={this.showCamera.bind(this)} />
+                            <SourceButton text="Camera Roll" icon="image" backgroundColor="#F93943" color="#fff" onPress={this.pickImage} />
+                        </View>
+                        <View style={styles.mapContainer}>
+                            <MapView
+                                style={styles.map}
+                                showsMyLocationButton={true}
+                                showsUserLocation={true}
+                                region={{
+                                    latitude: location.latitude,
+                                    longitude: location.longitude,
+                                    latitudeDelta: 0.0922, 
+                                    longitudeDelta: 0.0421
+                                }}
+                            >
+                                <MapView.Marker 
+                                    coordinate={{
+                                        latitude: location.latitude,
+                                        longitude: location.longitude
+                                    }} 
                                 />
+                            </MapView>
+
+                            <View style={[styles.formContainer, {flex: 1}]}>
+                                    <TextInput
+                                        style={styles.textInput}
+                                        onChangeText={text => this.setState({searchText: text})}
+                                        underlineColorAndroid="transparent"
+                                        selectionColor="#f93943"
+                                        value={this.state.searchText}
+                                        placeholder="Current Location"
+                                        onSubmitEditing={this._attemptGeocodeAsync}
+                                        onFocus={this.focusLocationText.bind(this)}
+                                        onBlur={this.unFocusLocationText.bind(this)}
+                                        />
+                                </View>               
+                        </View>
+                        <View style={{flex: 1, alignItems: 'center'}}>
+                            <SceneButton text="Create Scene" color="#f93943" width={150} topPad={5} onPress={this.handleSubmit.bind(this)} />
                         </View>
                     </View>
-                    <View style={{flex: 1, alignItems: 'center'}}>
-                        <SceneButton text="Create Scene" color="#f93943" width={150} topPad={5} onPress={this.handleSubmit.bind(this)} />
-                    </View>
-                </View>
+                </KeyboardAwareScrollView>
+             </ScrollView>
+             
             </View>
         )
     }
@@ -339,22 +377,22 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
     formContainer: {
-        marginRight: 40, 
-        marginLeft: 40, 
-        marginBottom: 40, 
-        marginTop: 10
+        paddingRight: 40, 
+        paddingLeft: 40, 
+        paddingBottom: 40, 
+        paddingTop: 10
     },
     buttonContainer: {
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-        marginBottom: 20,
+        paddingBottom: 20,
     },
     mapContainer: {
         flex: 2,
-        marginTop: 20,
-        marginBottom: 20
+        paddingTop: 20,
+        paddingBottom: 20
     },
     map: {
         //flex: 3,

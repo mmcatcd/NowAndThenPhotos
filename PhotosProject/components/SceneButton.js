@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Font } from 'expo';
-import {TouchableHighlight, Text, StyleSheet, View} from 'react-native';
+import {TouchableOpacity, Text, StyleSheet, View} from 'react-native';
 
 const styles = StyleSheet.create({
     button: {
@@ -45,7 +45,7 @@ export default class SceneButton extends React.Component {
         }
 
         return(
-            <TouchableHighlight 
+            <TouchableOpacity 
                 style={[styles.button, {
                     borderColor: this.props.color, 
                     paddingTop: topPad, 
@@ -54,7 +54,7 @@ export default class SceneButton extends React.Component {
                 }]} 
                 onPress={() => this.props.onPress()}>
                 <Text style={[styles.text, {color: this.props.color}]}>{this.props.text}</Text>
-            </TouchableHighlight>
+            </TouchableOpacity>
         );
     }
 }

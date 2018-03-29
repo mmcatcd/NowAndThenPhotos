@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Font } from 'expo';
-import {TouchableHighlight, Text, StyleSheet, View} from 'react-native';
+import {TouchableOpacity, Text, StyleSheet, View} from 'react-native';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
 
 const styles = StyleSheet.create({
@@ -48,7 +48,7 @@ export default class SourceButton extends React.Component {
         }
 
         return(
-            <TouchableHighlight 
+            <TouchableOpacity 
                 style={[styles.button, {
                     borderColor: this.props.borderColor != null ? this.props.borderColor : '#F93943',
                     backgroundColor: this.props.backgroundColor != null ? this.props.backgroundColor : '#fff'
@@ -58,7 +58,7 @@ export default class SourceButton extends React.Component {
                     <MaterialCommunityIcons name={this.props.icon} size={50} color={this.props.color} />
                     <Text style={[styles.text, {color: this.props.color}]}>{this.props.text}</Text>
                 </View>
-            </TouchableHighlight>
+            </TouchableOpacity>
         );
     }
 }

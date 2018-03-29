@@ -2,7 +2,6 @@ import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import {StackNavigator} from 'react-navigation';
 
-import SceneCamera from './components/SceneCamera';
 import SourcePicker from './components/SourcePicker';
 import SceneList from './components/SceneList';
 import NewScene from './components/NewScene';
