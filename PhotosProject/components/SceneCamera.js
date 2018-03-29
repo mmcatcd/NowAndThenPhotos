@@ -219,8 +219,6 @@ class SceneCamera extends React.Component {
                           }
                         })()}
                       </TouchableOpacity>
-                      {/*<Text>Long: {longLat.longitude}</Text>
-                      <Text>Lat: {longLat.latitude}</Text>*/}
                       <Text style={styles.locationText}>{parseInt(distance)} metres away</Text>
                     </View>
                   )
