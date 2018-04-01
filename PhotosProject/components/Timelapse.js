@@ -6,11 +6,12 @@ import {
   StyleSheet,
   Image,
   Dimensions,
-
+  CameraRoll
 } from 'react-native';
 import NavBar from './NavBar';
-import {Video} from 'expo';
+import {Video, FileSystem} from 'expo';
 import { MaterialIcons, Octicons } from '@expo/vector-icons';
+import postScene from '../api/postScene';
 import video from '../assets/timelapse.mp4';
 
 export default class Timelapse extends React.Component {
@@ -21,20 +22,8 @@ export default class Timelapse extends React.Component {
       shouldPlay: false,
       isLoading: true,
       dataSource: null
-    }
-  }
-
-  componentDidMount() {
-    return fetch('https://facebook.github.io/react-native/movies.json')
-      .then((response) => response.json())
-      .then((responseJson) => {
-        this.setState({
-          isLoading: false,
-          dataSource: responseJson.movies
-        });
-      }).catch((error) => {
-        console.error(error);
-      })
+    },
+    response: null,
   }
 
   handlePlayAndPause = () => {
@@ -60,33 +49,31 @@ export default class Timelapse extends React.Component {
       }
     }
 
-    return(
-      <View style={styles.container}>
-        <NavBar close={this.props.close} title="timelapse" />
-        <TouchableOpacity style={styles.videoContainer} onPress={this.handlePlayAndPause}>
-          <Video
-            source={require('../assets/timelapse.mp4')}
+    const renderVideo = () => {
+      if(this.props.video === null) {
+        return(
+        <View>
+          <Text>Loading video</Text>
+        </View>
+        )
+      }
+
+      return(
+        <Video
+            source={{uri: this.props.video}}
             shouldPlay={this.state.shouldPlay}
             resizeMode="cover"
             style={{ flex: 1 }}
             isMuted={this.state.mute}
-            isLooping={true}>
-          </Video>   
-          {/*}
-          <View style={styles.controlBar}>
-            <MaterialIcons 
-              name={this.state.mute ? "volume-mute" : "volume-up"}
-              size={45} 
-              color="white" 
-              onPress={this.handleVolume} 
-            />
-            <MaterialIcons 
-              name={this.state.shouldPlay ? "pause" : "play-arrow"} 
-              size={45} 
-              color="white" 
-              onPress={this.handlePlayAndPause} 
-            />
-          </View>*/}
+            isLooping={true} />
+      )
+    }
+
+    return(
+      <View style={styles.container}>
+        <NavBar close={this.props.close} title="timelapse" />
+        <TouchableOpacity style={styles.videoContainer} onPress={this.handlePlayAndPause}>
+          {renderVideo()}
         </TouchableOpacity>
         <View style={styles.shareContainer}>
           <MaterialIcons 

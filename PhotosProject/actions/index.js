@@ -28,3 +28,11 @@ export const addLocation = (location, sceneId) => ({
     sceneId,
     location
 })
+
+export const ADD_VIDEO = 'ADD_VIDEO'
+
+export const addVideo = (sceneId, video) => ({
+    type: ADD_VIDEO,
+    sceneId,
+    video
+});

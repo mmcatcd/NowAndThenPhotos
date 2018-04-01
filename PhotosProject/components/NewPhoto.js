@@ -56,10 +56,11 @@ export default class NewPhoto extends React.Component {
     }
 
     takePhoto = async () => {
+        const options = { quality: 0.5, base64: false, exif: false };
         Vibration.vibrate();
         this.props.onExit();
         if (this.camera) {
-            let photo = await this.camera.takePictureAsync();
+            let photo = await this.camera.takePictureAsync(options);
             let savedUri = await CameraRoll.saveToCameraRoll(photo.uri);
 
             this.props.imageUpdate(savedUri);
