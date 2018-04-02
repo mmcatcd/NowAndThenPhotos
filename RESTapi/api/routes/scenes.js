@@ -70,7 +70,7 @@ router.post('/create/:sceneId', upload.any(), (req, res, next) => {
   const vidDir = './scenes/' + sceneId + '/video.mp4';
 
   const cmd = `ffmpeg -r 1/2 -pattern_type glob -i 'scenes/` 
-  + sceneId + `/*.jpeg' -filter:v scale=-2:1080 -c:v libx264 -r 30 -y -pix_fmt yuv420p scenes/` 
+  + sceneId + `/*.jpeg' -filter:v scale=-2:1080 -c:v libx264 -y -pix_fmt yuv420p scenes/` 
   + sceneId + `/video.mp4`;
 
   exec(cmd, function(err, stdout, stderr) {
