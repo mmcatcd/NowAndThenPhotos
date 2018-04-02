@@ -64,7 +64,10 @@ class SceneList extends React.Component {
                 <Swiper style={styles.wrapper} loop={false} showsPagination={false}>
                     {Object.entries(scenes).map(([id, scene]) => {
                         const previewImageId = scene.photoIds[0];
-                        const previewImage = photos[previewImageId].url;
+                        let previewImage = '';
+                        if(!previewImageId == '') {
+                            previewImage = photos[previewImageId].url;
+                        }
                         return(
                             <View style={{flex: 1}}>
                                 <ScenePreview scene={scene} previewImage={previewImage} onPress={() => this.props.navigation.navigate('SceneView', {sceneId: id})} />
