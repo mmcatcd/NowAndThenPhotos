@@ -1,8 +1,9 @@
 export const CREATE_SCENE = 'CREATE_SCENE'
 
-export const createScene = (name) => ({
+export const createScene = (name, date) => ({
     type: CREATE_SCENE,
-    name
+    name,
+    date
 })
 
 export const CREATE_PHOTO = 'CREATE_PHOTO'

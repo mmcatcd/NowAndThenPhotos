@@ -13,8 +13,7 @@ let initialState = {
 const sceneReducer = (state = initialState, action) => {
     switch (action.type) {
         case CREATE_SCENE:
-            scene = { id: uuidv1(), name: action.name, location: {}, photoIds: [], video: null }
-            // state = Object.assign({}, state, { scenes: {...state.scenes, [scene.id]: scene}, loading: false });
+            scene = { id: uuidv1(), name: action.name, location: {}, photoIds: [], video: null, date: action.date }
             state = {
                 ...state,
                 scenes: {...state.scenes, [scene.id]: scene},

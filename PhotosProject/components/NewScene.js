@@ -191,7 +191,15 @@ class NewScene extends React.Component {
         })
 
         if(containsScene == null && image != null && name != null && location != null) {
-            await this.props.createScene(name);
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+                ];
+            const date = new Date();
+            const month = monthNames[date.getMonth()];
+            const day = date.getDay();
+            const year = date.getFullYear();
+            const dateString = month + ' ' + day + ', ' + year;
+            await this.props.createScene(name, dateString);
 
             id = Object.values(this.props.scenes).find(scene => {
                 return scene.name == name;
