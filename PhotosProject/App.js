@@ -38,6 +38,9 @@ export default class App extends React.Component {
   async componentDidMount() {
       await Font.loadAsync({
         'futura-medium': require('./assets/fonts/futura-medium.ttf'),
+        'open-sans-light': require('./assets/fonts/OpenSans-Light.ttf'),
+        'open-sans-regular': require('./assets/fonts/OpenSans-Regular.ttf'),
+        'open-sans-semibold': require('./assets/fonts/OpenSans-SemiBold.ttf'),
       });
 
       this.setState({fontLoaded: true});
