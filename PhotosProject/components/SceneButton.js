@@ -7,13 +7,7 @@ const styles = StyleSheet.create({
     button: {
         alignItems: 'center',
         justifyContent: 'center',
-
-        /*
-        paddingTop: this.props.topPad != null ? this.props.topPad : 10,
-        paddingBottom: this.props.topPad != null ? this.props.topPad : 10,
-        paddingLeft: this.props.sidePad  != null? this.props.sidePad : 75,
-        paddingRight: this.props.sidePad != null ? this.props.sidePad : 75, */
-
+        height: 37,
         borderWidth: 2,
     },
     text: {
