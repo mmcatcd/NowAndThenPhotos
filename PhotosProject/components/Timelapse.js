@@ -12,7 +12,6 @@ import NavBar from './NavBar';
 import {Video, FileSystem} from 'expo';
 import { MaterialIcons, Octicons } from '@expo/vector-icons';
 import postScene from '../api/postScene';
-import video from '../assets/timelapse.mp4';
 
 export default class Timelapse extends React.Component {
   state = {
