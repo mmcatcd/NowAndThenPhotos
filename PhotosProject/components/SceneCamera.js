@@ -139,7 +139,8 @@ class SceneCamera extends React.Component {
       });
 
       //Create new video
-      const serverAdr = 'http://192.168.23.72:3000';
+      console.log('sceneId', sceneId);
+      const serverAdr = 'http://api.nowandthen.io';
       postScene(images, sceneId, 2)
       .then((res) => {
           console.log('response', res);

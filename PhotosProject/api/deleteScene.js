@@ -1,5 +1,5 @@
 export default deleteScene = (sceneId) => {
-  const serverAdr = 'http://192.168.23.72:3000';
+  const serverAdr = 'http://api.nowandthen.io';
 
   return fetch(serverAdr + '/scenes/delete/' + sceneId, {
     headers: {

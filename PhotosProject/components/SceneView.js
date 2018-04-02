@@ -72,7 +72,7 @@ class SceneView extends React.Component {
 
         //Checks if no video currently exists
         if(video == null || video == undefined) {
-            const serverAdr = 'http://192.168.23.72:3000';
+            const serverAdr = 'http://api.nowandthen.io';
             postScene(images, sceneId, 5)
             .then((res) => {
                 console.log('response', res);
@@ -198,27 +198,18 @@ class SceneView extends React.Component {
         }
     }
 
-    deletePhotos() {
+    async deletePhotos() {
         const sceneId = this.props.navigation.state.params.sceneId;
         const {longPressed} = this.state;
         const data = this.props.scenes[sceneId].photoIds.slice().reverse();
         const photos = this.props.photos;
-        const images = [];
         const video = this.props.scenes[sceneId].video;
-
-        data.map((photoId, index) => {
-            const newImage = {
-                url: this.props.photos[photoId].url,
-                id: photoId
-            }
-            images[index] = newImage;
-        });
 
         if(this.imagesSelected(longPressed) !== data.length) {
             for(let i = 0; i < longPressed.length; i++) {
                 if(longPressed[i]) {
                     const photoId = data[i];
-                    this.props.deletePhoto(photoId, sceneId);
+                    await this.props.deletePhoto(photoId, sceneId);
                     longPressed[i] = false;
                     this.setState({longPressed});
                 }
@@ -239,18 +230,29 @@ class SceneView extends React.Component {
 
         this.setState({showDelete: false});
 
-        const serverAdr = 'http://192.168.23.72:3000';
-            postScene(images, sceneId, 5)
-            .then((res) => {
-                console.log('response', res);
-                Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
-                .then(({uri}) => {
-                    CameraRoll.saveToCameraRoll(uri).then((result) => {
-                        this.props.addVideo(sceneId, result);
-                        deleteScene(sceneId);
-                    });
+        const dataNew = this.props.scenes[sceneId].photoIds.slice().reverse();
+        const images = [];
+
+        dataNew.map((photoId, index) => {
+            const newImage = {
+                url: this.props.photos[photoId].url,
+                id: photoId
+            }
+            images[index] = newImage;
+        });
+
+        const serverAdr = 'http://api.nowandthen.io';
+        postScene(images, sceneId, 5)
+        .then((res) => {
+            console.log('response', res);
+            Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
+            .then(({uri}) => {
+                CameraRoll.saveToCameraRoll(uri).then((result) => {
+                    this.props.addVideo(sceneId, result);
+                    deleteScene(sceneId);
                 });
             });
+        });        
     }
 
     render() {

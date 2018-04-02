@@ -1,5 +1,5 @@
 export default postScene = (images, sceneId, time) => {
-  const serverAdr = 'http://192.168.23.72:3000';
+  const serverAdr = 'http://api.nowandthen.io';
   const data = new FormData();
 
   data.append('time', time);
