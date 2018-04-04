@@ -200,12 +200,6 @@ class SceneView extends React.Component {
         }
     }
 
-    deleteSceneFromList() {
-        const sceneId = this.props.navigation.state.params.sceneId;
-        this.props.deleteScene(sceneId);
-        this.props.navigation.goBack();
-    }
-
     async deletePhotos() {
         const sceneId = this.props.navigation.state.params.sceneId;
         const {longPressed} = this.state;
@@ -328,7 +322,7 @@ class SceneView extends React.Component {
                         animationType="slide"
                         transparent={false}
                         onRequestClose={() => this.setState({showSettings: false})} >
-                        <Settings scene={sceneId} close={() => this.setState({showSettings: false})} deleteScene={this.deleteSceneFromList.bind(this)} />
+                        <Settings scene={sceneId} close={() => this.setState({showSettings: false})} onDelete={() => this.props.navigation.goBack()}/>
                     </Modal>
                     {camera()}
                     <ScrollView style={styles.scrollView} >
