@@ -118,14 +118,40 @@ class SceneCamera extends React.Component {
   }
 
   handlePhoto = async () => {
+    const options = { quality: 0.5, base64: false, exif: false };
     Vibration.vibrate();
     this.props.takePhoto();
     if (this.camera) {
-      let photo = await this.camera.takePictureAsync();
+      let photo = await this.camera.takePictureAsync(options);
       let savedUri = await CameraRoll.saveToCameraRoll(photo.uri);
       const sceneId = this.props.sceneId;
 
-      this.props.createPhoto(savedUri, sceneId);
+      await this.props.createPhoto(savedUri, sceneId);
+      const data = this.props.scenes[sceneId].photoIds.slice().reverse();
+      const images = [];
+
+      data.map((photoId, index) => {
+        const newImage = {
+            url: this.props.photos[photoId].url,
+            id: photoId
+        }
+        images[index] = newImage;
+      });
+
+      //Create new video
+      console.log('sceneId', sceneId);
+      const serverAdr = 'http://api.nowandthen.io';
+      postScene(images, sceneId, 2)
+      .then((res) => {
+          console.log('response', res);
+          Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
+          .then(({uri}) => {
+              CameraRoll.saveToCameraRoll(uri).then((result) => {
+                  this.props.addVideo(sceneId, result);
+                  deleteScene(sceneId);
+              });
+          });
+      });
     } else {
       console.log('No camera :-(');
     }

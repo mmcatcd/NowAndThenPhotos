@@ -16,11 +16,12 @@ import {
     Easing
 } from 'react-native';
 import {MaterialCommunityIcons} from '@expo/vector-icons';
-import {Camera, Permissions, Constants} from 'expo';
+import {Camera, Permissions, Constants, FileSystem} from 'expo';
 import {StackNavigator} from 'react-navigation';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import NavBar from './NavBar';
 import Timelapse from './Timelapse';
+import Settings from './Settings';
 
 //Redux imports
 import {bindActionCreators} from 'redux';
@@ -29,6 +30,7 @@ import { connect } from 'react-redux';
 import * as Actions from '../actions'; //Import your actions
 import SceneCamera from './SceneCamera';
 import RoundButton from './RoundButton';
+import deleteScene from '../api/deleteScene';
 
 const window = Dimensions.get('window');
 let header = false;
@@ -45,7 +47,9 @@ class SceneView extends React.Component {
             visible: false,
             index: 0
         },
-        showTimelapse: false
+        showTimelapse: false,
+        showSettings: false,
+        video: null
     }
 
     static navigationOptions = ({navigation}) => ({
@@ -53,6 +57,37 @@ class SceneView extends React.Component {
         title: 'scene',
         headerRight: (<View />),
     });
+
+    componentDidMount() {
+        const sceneId = this.props.navigation.state.params.sceneId;
+        const data = this.props.scenes[sceneId].photoIds.slice().reverse();
+        const images = [];
+        const video = this.props.scenes[sceneId].video;
+
+        data.map((photoId, index) => {
+            const newImage = {
+                url: this.props.photos[photoId].url,
+                id: photoId
+            }
+            images[index] = newImage;
+        });
+
+        //Checks if no video currently exists
+        if(video == null || video == undefined) {
+            const serverAdr = 'http://api.nowandthen.io';
+            postScene(images, sceneId, 5)
+            .then((res) => {
+                console.log('response', res);
+                Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
+                .then(({uri}) => {
+                    CameraRoll.saveToCameraRoll(uri).then((result) => {
+                        this.props.addVideo(sceneId, result);
+                        deleteScene(sceneId);
+                    });
+                });
+            });
+        }
+    }
 
     async componentWillMount() {
         const {status} = await Permissions.askAsync(Permissions.CAMERA);
@@ -165,16 +200,24 @@ class SceneView extends React.Component {
         }
     }
 
-    deletePhotos() {
+    deleteSceneFromList() {
+        const sceneId = this.props.navigation.state.params.sceneId;
+        this.props.deleteScene(sceneId);
+        this.props.navigation.goBack();
+    }
+
+    async deletePhotos() {
         const sceneId = this.props.navigation.state.params.sceneId;
         const {longPressed} = this.state;
         const data = this.props.scenes[sceneId].photoIds.slice().reverse();
+        const photos = this.props.photos;
+        const video = this.props.scenes[sceneId].video;
 
         if(this.imagesSelected(longPressed) !== data.length) {
             for(let i = 0; i < longPressed.length; i++) {
                 if(longPressed[i]) {
                     const photoId = data[i];
-                    this.props.deletePhoto(photoId, sceneId);
+                    await this.props.deletePhoto(photoId, sceneId);
                     longPressed[i] = false;
                     this.setState({longPressed});
                 }
@@ -194,25 +237,59 @@ class SceneView extends React.Component {
         }
 
         this.setState({showDelete: false});
-    }
 
-    render() {
-        const sceneId = this.props.navigation.state.params.sceneId;
-        const data = this.props.scenes[sceneId].photoIds;
-        const photoIds = this.props.scenes[sceneId].photoIds;
-        const overlayPhotoId = photoIds[photoIds.length - 1];
-        const {longPressed, imagePreview, showTimelapse} = this.state;
+        const dataNew = this.props.scenes[sceneId].photoIds.slice().reverse();
+        const images = [];
 
-        const dataIn = data.slice().reverse();
-        let images = [];
-        dataIn.map((photoId, index) => {
+        dataNew.map((photoId, index) => {
             const newImage = {
-                url: this.props.photos[photoId].url
+                url: this.props.photos[photoId].url,
+                id: photoId
             }
             images[index] = newImage;
         });
 
+        const serverAdr = 'http://api.nowandthen.io';
+        postScene(images, sceneId, 5)
+        .then((res) => {
+            console.log('response', res);
+            Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
+            .then(({uri}) => {
+                CameraRoll.saveToCameraRoll(uri).then((result) => {
+                    this.props.addVideo(sceneId, result);
+                    deleteScene(sceneId);
+                });
+            });
+        });        
+    }
+
+    render() {
+        const sceneId = this.props.navigation.state.params.sceneId;
+        const scene = sceneId != undefined ? this.props.scenes[sceneId] : null;
+        const data = scene != null ? this.props.scenes[sceneId].photoIds : null;
+        const photoIds = scene != null ? this.props.scenes[sceneId].photoIds : null;
+        const overlayPhotoId = scene != null ? photoIds[photoIds.length - 1] : null;
+        const {longPressed, imagePreview, showTimelapse, showSettings} = this.state;
+        const video = scene != null ? this.props.scenes[sceneId].video : null;
+
+        const dataIn = data != null ? data.slice().reverse() : null;
+        let images = [];
+        if(data != null) {
+            dataIn.map((photoId, index) => {
+                const newImage = {
+                    url: this.props.photos[photoId].url,
+                    id: photoId
+                }
+                images[index] = newImage;
+            });
+        }
+
         const camera = () => {
+            if(scene == null) {
+                return(
+                    <View />
+                )
+            };
             return(
                 <Animated.View style={{position: 'absolute', width: window.width, height: window.height, zIndex: 100000, transform: [{translateY: this.state.position }]}}>
                     <SceneCamera 
@@ -224,7 +301,7 @@ class SceneView extends React.Component {
         }
 
         const {hasCameraPermission} = this.state;
-        if(hasCameraPermission === null) {
+        if(hasCameraPermission === null || scene == null) {
             return <View />;
         } else if(hasCameraPermission === false) {
             return <Text>No access to camera</Text>;
@@ -244,7 +321,14 @@ class SceneView extends React.Component {
                         animationType="slide"
                         transparent={true}
                         onRequestClose={() => this.setState({showTimelapse: false})}>
-                        <Timelapse close={() => this.setState({showTimelapse: false})} />
+                        <Timelapse images={images} scene={sceneId} video={video} close={() => this.setState({showTimelapse: false})} />
+                    </Modal>
+                    <Modal
+                        visible={showSettings}
+                        animationType="slide"
+                        transparent={false}
+                        onRequestClose={() => this.setState({showSettings: false})} >
+                        <Settings scene={sceneId} close={() => this.setState({showSettings: false})} deleteScene={this.deleteSceneFromList.bind(this)} />
                     </Modal>
                     {camera()}
                     <ScrollView style={styles.scrollView} >
@@ -279,7 +363,8 @@ class SceneView extends React.Component {
                     })()}
                     <BottomBar 
                         onPressCamera={this.showCamera.bind(this)}
-                        onPressPlay={this.showTimelapse.bind(this)} />
+                        onPressPlay={this.showTimelapse.bind(this)}
+                        onPressSettings={() => this.setState({showSettings: true})} />
                 </View>
             )
         }
@@ -310,10 +395,12 @@ const styles = StyleSheet.create({
     },
 })
 
-const BottomBar = ({onPressCamera, onPressPlay}) => {
+const BottomBar = ({onPressCamera, onPressPlay, onPressSettings}) => {
     return(
         <View style={bottomBarStyles.container}>
-            <MaterialCommunityIcons name='settings' size={28} color='#fff' />
+            <TouchableOpacity onPress={onPressSettings}>
+                <MaterialCommunityIcons name='settings' size={28} color='#fff' />
+            </TouchableOpacity>
             <TouchableOpacity onPress={onPressCamera}>
                 <MaterialCommunityIcons name='camera' size={28} color='#fff' />
             </TouchableOpacity>

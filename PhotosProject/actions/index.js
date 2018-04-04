@@ -1,8 +1,16 @@
 export const CREATE_SCENE = 'CREATE_SCENE'
 
-export const createScene = (name) => ({
+export const createScene = (name, date) => ({
     type: CREATE_SCENE,
-    name
+    name,
+    date
+})
+
+export const DELETE_SCENE = 'DELETE_SCENE'
+
+export const deleteScene = (sceneId) => ({
+    type: DELETE_SCENE,
+    sceneId
 })
 
 export const CREATE_PHOTO = 'CREATE_PHOTO'
@@ -28,3 +36,11 @@ export const addLocation = (location, sceneId) => ({
     sceneId,
     location
 })
+
+export const ADD_VIDEO = 'ADD_VIDEO'
+
+export const addVideo = (sceneId, video) => ({
+    type: ADD_VIDEO,
+    sceneId,
+    video
+});

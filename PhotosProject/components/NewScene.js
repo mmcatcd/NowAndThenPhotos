@@ -191,7 +191,15 @@ class NewScene extends React.Component {
         })
 
         if(containsScene == null && image != null && name != null && location != null) {
-            await this.props.createScene(name);
+            const monthNames = ["January", "February", "March", "April", "May", "June",
+                "July", "August", "September", "October", "November", "December"
+                ];
+            const date = new Date();
+            const month = monthNames[date.getMonth()];
+            const day = date.getDate();
+            const year = date.getFullYear();
+            const dateString = month + ' ' + day + ', ' + year;
+            await this.props.createScene(name, dateString);
 
             id = Object.values(this.props.scenes).find(scene => {
                 return scene.name == name;
@@ -201,6 +209,32 @@ class NewScene extends React.Component {
 
             await this.props.createPhoto(image, id);
             await this.props.addLocation(location, id);
+
+            const sceneId = id;
+            const data = this.props.scenes[sceneId].photoIds.slice().reverse();
+            const images = [];
+
+            data.map((photoId, index) => {
+                const newImage = {
+                    url: this.props.photos[photoId].url,
+                    id: photoId
+                }
+                images[index] = newImage;
+            });
+
+            //Create new video
+            const serverAdr = 'http://api.nowandthen.io';
+            postScene(images, sceneId, 2)
+            .then((res) => {
+                console.log('response', res);
+                Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
+                .then(({uri}) => {
+                    CameraRoll.saveToCameraRoll(uri).then((result) => {
+                        this.props.addVideo(sceneId, result);
+                        deleteScene(sceneId);
+                    });
+                });
+            });
 
             this.props.sceneCreated(id);
         } else if (image == null) {

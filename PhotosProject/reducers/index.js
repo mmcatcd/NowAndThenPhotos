@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-import { CREATE_SCENE, CREATE_PHOTO, ADD_LOCATION, DELETE_PHOTO } from "../actions/"
+import { CREATE_SCENE, DELETE_SCENE, CREATE_PHOTO, ADD_LOCATION, DELETE_PHOTO, ADD_VIDEO } from "../actions/"
 
 const uuidv1 = require('uuid/v1');
 
@@ -13,12 +13,21 @@ let initialState = {
 const sceneReducer = (state = initialState, action) => {
     switch (action.type) {
         case CREATE_SCENE:
-            scene = { id: uuidv1(), name: action.name, location: {}, photoIds: [] }
-            // state = Object.assign({}, state, { scenes: {...state.scenes, [scene.id]: scene}, loading: false });
+            scene = { id: uuidv1(), name: action.name, location: {}, photoIds: [], video: null, date: action.date }
             state = {
                 ...state,
                 scenes: {...state.scenes, [scene.id]: scene},
                 loading: false
+            }
+            return state;
+        case DELETE_SCENE:
+            scenes = {...state.scenes}
+            delete scenes[action.sceneId];
+            console.log('sceneId', action.sceneId);
+            console.log(scenes);
+            state = {
+                ...state,
+                scenes: scenes
             }
             return state;
         case CREATE_PHOTO:
@@ -35,11 +44,16 @@ const sceneReducer = (state = initialState, action) => {
             scenePhotos = [...state.scenes[action.sceneId].photoIds];
             updatedPhotoIds = scenePhotos.filter(item => item !== action.photoId);
             updatedScene = {...state.scenes[action.sceneId], photoIds: updatedPhotoIds};
+
+            photos = {...state.photos};
+            delete photos[action.photoId];
             
             state = {
                 ...state,
-                scenes: {...state.scenes, [action.sceneId]: updatedScene}
+                scenes: {...state.scenes, [action.sceneId]: updatedScene},
+                photos: photos
             }
+
             return state;
         case ADD_LOCATION:
             state = {
@@ -53,7 +67,18 @@ const sceneReducer = (state = initialState, action) => {
                 }
             }
 
-            console.log(JSON.stringify(state.scenes));
+            return state;
+        case ADD_VIDEO:
+            state = {
+                ...state,
+                scenes: {
+                    ...state.scenes,
+                    [action.sceneId]: {
+                        ...state.scenes[action.sceneId],
+                        video: action.video
+                    }
+                }
+            }
             return state;
         default:
             return state;
