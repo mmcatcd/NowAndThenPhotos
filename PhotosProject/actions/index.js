@@ -6,6 +6,13 @@ export const createScene = (name, date) => ({
     date
 })
 
+export const DELETE_SCENE = 'DELETE_SCENE'
+
+export const deleteScene = (sceneId) => ({
+    type: DELETE_SCENE,
+    sceneId
+})
+
 export const CREATE_PHOTO = 'CREATE_PHOTO'
 
 export const createPhoto = (url, sceneId) => ({

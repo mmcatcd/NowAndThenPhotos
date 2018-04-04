@@ -58,13 +58,19 @@ class SceneList extends React.Component {
                         sceneCreated={this.sceneCreated.bind(this)} 
                         close={this.closeNewScene.bind(this)} />
                 </Modal>
-                <View style={{alignItems: 'center'}}>
-                    <View style={[styles.horizontalLine, {width: window.width - 50}]} />
-                </View>
+                {(() => {
+                    if(Object.keys(scenes).length != 0) {
+                        return(
+                            <View style={{alignItems: 'center'}}>
+                                <View style={[styles.horizontalLine, {width: window.width - 50}]} />
+                            </View>
+                        );
+                    }
+                })()}
                 <Swiper style={styles.wrapper} loop={false} showsPagination={false}>
-                    {Object.entries(scenes).map(([id, scene]) => {
+                    {Object.entries(scenes).slice().reverse().map(([id, scene]) => {
                         const previewImageId = scene.photoIds[0];
-                        let previewImage = '';
+                        let previewImage = '/';
                         if(!previewImageId == '') {
                             previewImage = photos[previewImageId].url;
                         }
@@ -78,26 +84,6 @@ class SceneList extends React.Component {
                 <View style={styles.newSceneContainer}>
                     <SceneButton text="New Scene" color="#F93943" width={200} onPress={() => this.setState({newSceneVisible: true})} />
                 </View>
-                {/*}
-                <View style={styles.container}>
-                    <SceneButton text="New Scene" color="#F93943" onPress={() => this.setState({newSceneVisible: true})} />
-                    <List>
-                    <FlatList
-                        data={scenes}
-                        keyExtractor={item => item.id}
-                        renderItem={({ item }) => (
-                        <ListItem
-                            // roundAvatar
-                            title={item.name}
-                            subtitle={item.id}
-                            onPress={() => {
-                                return this.props.navigation.navigate('SceneView', {sceneId: item.id})
-                            }}
-                        />
-                        )}
-                    />
-                    </List>
-                </View>*/}
             </View>
         );
     }

@@ -1,6 +1,6 @@
 import { combineReducers } from 'redux';
 
-import { CREATE_SCENE, CREATE_PHOTO, ADD_LOCATION, DELETE_PHOTO, ADD_VIDEO } from "../actions/"
+import { CREATE_SCENE, DELETE_SCENE, CREATE_PHOTO, ADD_LOCATION, DELETE_PHOTO, ADD_VIDEO } from "../actions/"
 
 const uuidv1 = require('uuid/v1');
 
@@ -18,6 +18,16 @@ const sceneReducer = (state = initialState, action) => {
                 ...state,
                 scenes: {...state.scenes, [scene.id]: scene},
                 loading: false
+            }
+            return state;
+        case DELETE_SCENE:
+            scenes = {...state.scenes}
+            delete scenes[action.sceneId];
+            console.log('sceneId', action.sceneId);
+            console.log(scenes);
+            state = {
+                ...state,
+                scenes: scenes
             }
             return state;
         case CREATE_PHOTO:
