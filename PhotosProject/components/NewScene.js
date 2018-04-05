@@ -299,7 +299,7 @@ class NewScene extends React.Component {
     }
 
     updateImage(image) {
-        this.setState({image});
+        this.setState({image: image});
     }
 
     _scrollToInput (reactNode) {
