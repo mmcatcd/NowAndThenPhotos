@@ -18,21 +18,23 @@ export default (props) => {
     });
 
     return(
-            <View style={styles.container}>
-                <View style={styles.row}>
-                    <View style={[styles.column, {borderBottomWidth: props.width}]} />
-                    <View style={[styles.column, {borderLeftWidth: props.width, borderRightWidth: props.width, borderBottomWidth: props.width}]} />
-                    <View style={[styles.column, {borderBottomWidth: props.width}]} />
-                </View>
-                <View style={styles.row}>
-                    <View style={[styles.column, {borderBottomWidth: props.width}]} />
-                    <View style={[styles.column, {borderLeftWidth: props.width, borderRightWidth: props.width, borderBottomWidth: props.width}]} />
-                    <View style={[styles.column, {borderBottomWidth: props.width}]} />
-                </View>
-                <View style={styles.row}>
-                    <View style={styles.column} />
-                    <View style={[styles.column, {borderLeftWidth: props.width, borderRightWidth: props.width}]} />
-                    <View style={styles.column} />
+            <View style={{height: props.height}}>
+                <View style={styles.container}>
+                    <View style={styles.row}>
+                        <View style={[styles.column, {borderBottomWidth: props.width}]} />
+                        <View style={[styles.column, {borderLeftWidth: props.width, borderRightWidth: props.width, borderBottomWidth: props.width}]} />
+                        <View style={[styles.column, {borderBottomWidth: props.width}]} />
+                    </View>
+                    <View style={styles.row}>
+                        <View style={[styles.column, {borderBottomWidth: props.width}]} />
+                        <View style={[styles.column, {borderLeftWidth: props.width, borderRightWidth: props.width, borderBottomWidth: props.width}]} />
+                        <View style={[styles.column, {borderBottomWidth: props.width}]} />
+                    </View>
+                    <View style={styles.row}>
+                        <View style={styles.column} />
+                        <View style={[styles.column, {borderLeftWidth: props.width, borderRightWidth: props.width}]} />
+                        <View style={styles.column} />
+                    </View>
                 </View>
             </View>
     )

@@ -226,15 +226,17 @@ class SceneCamera extends React.Component {
     //  position: "absolute" on the view makes grid display properly with onion but overlay is pushed out of the way?
     // putting grid in the view as before make it work however the view is used to clip the image halfway for SPLIT_HORIZONTAL (this.state.cameraHeight / 2)
     return (
-      <View {...this.panResponder.panHandlers} style={{flex: 1}}>
-        <Grid style={styles.grid} size={5} width={this.state.overlayKind !== SPLIT_HORIZONTAL && this.state.grid ? 2 : 0} color="rgba(255, 255, 255, 0.5)"/>
-        <View style={{height: overlayStyle["viewHeight"], overflow: "hidden"}}>
-          {resultImg && <Image
-            source={{uri: resultImg}}
-            style={[styles.overlayImage, {height: this.state.cameraHeight, top: overlayStyle["imageTop"], opacity: overlayStyle["imageOpacity"]},]}
-            />
-          }
+      <View style={{flex: 1}}>
+        <View style={{flex: 1}}>
+          <View style={{height: overlayStyle["viewHeight"], overflow: "hidden"}}>
+            {resultImg && <Image
+              source={{uri: resultImg}}
+              style={[styles.overlayImage, {height: this.state.cameraHeight, top: overlayStyle["imageTop"], opacity: overlayStyle["imageOpacity"]},]}
+              />
+            }
+          </View>
         </View>
+        {/*<Grid style={styles.grid} size={5} width={this.state.overlayKind !== SPLIT_HORIZONTAL && this.state.grid ? 2 : 0} color="rgba(255, 255, 255, 0.5)"/>*/}
       </View>
     );
   }
@@ -290,9 +292,15 @@ class SceneCamera extends React.Component {
                 }
               })()}
             </Animated.View>
-
             {this.renderCurrentOverlay()}
 
+            <View {...this.panResponder.panHandlers}>
+            <Grid style={styles.grid}
+                size={5} 
+                height={this.state.cameraHeight} 
+                width={this.state.overlayKind !== SPLIT_HORIZONTAL && this.state.grid ? 2 : 0} 
+                color="rgba(255, 255, 255, 0.5)"/>
+            </View>
           </Camera>
           <View style={styles.controlsContainer} >
             <View style={styles.controls}>
@@ -376,7 +384,7 @@ const styles = StyleSheet.create({
   grid: {
     position: 'absolute',
     top: 0,
-    zIndex: 10000
+    //zIndex: 10000000000
   },
   locationText: {
     color: '#fff',
