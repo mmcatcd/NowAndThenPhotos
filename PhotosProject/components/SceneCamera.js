@@ -35,7 +35,13 @@ const GEOLOCATION_OPTIONS = {
   maximumAge: 1000,
   timeInterval: 1,
   distanceInterval: 1
- };
+};
+
+const OVERLAY_COUNT = 3;
+
+const OFF = 0;
+const ONION = 1;
+const SPLIT_HORIZONTAL = 2;
 
 class SceneCamera extends React.Component {
   state = {
@@ -49,7 +55,7 @@ class SceneCamera extends React.Component {
     photoId: 1,
     optionsPressed : false,
     optionsHeight: new Animated.Value(5),
-    overlay: false,
+    overlayKind: 0,
     grid: false,
     errorMessage: null,
     cameraHeight: null,
@@ -57,6 +63,8 @@ class SceneCamera extends React.Component {
     position: 0,
     distance: null
   }
+
+  overlayIs = (kind) => OVERLAY_KINDS[kind] === this.state.overlayKind;
 
   static navigationOptions = {
     header: null
@@ -81,7 +89,7 @@ class SceneCamera extends React.Component {
 
       onPanResponderMove: (e, {dx, dy}) => {
         //gesture progress
-        if(this.state.overlay) {
+        if(this.state.overlayKind === ONION) {
           this.setState({
             overlayOpacity: 0.5 + this.dragScaleY(dy)
           });
@@ -182,9 +190,10 @@ class SceneCamera extends React.Component {
       this.setState({optionsPressed: true});
   }
 
-  displayOverlay() {
+  advanceOverlayKind() {
     this.setState({
-      overlay: !this.state.overlay
+      overlayKind: (this.state.overlayKind + 1) % OVERLAY_COUNT,
+      overlayOpacity: 0.5
     });
   }
 
@@ -194,19 +203,48 @@ class SceneCamera extends React.Component {
     });
   }
 
+  renderCameraFlip = () => {
+    if(this.state.type === Camera.Constants.Type.back) {
+      return <MaterialCommunityIcons name="camera-front" size={28} color="#F93943" style={styles.controlsIcon} />;
+    } else {
+      return <MaterialCommunityIcons name="camera-rear" size={28} color="#F93943" style={styles.controlsIcon} />;
+    }
+  }
+
+  renderCurrentOverlay = () => {
+    const resultImg = this.props.image;
+    let overlayStyle;
+
+    if (this.state.overlayKind === ONION) {
+      overlayStyle = {viewHeight: this.state.cameraHeight, imageOpacity: this.state.overlayOpacity}
+    } else if (this.state.overlayKind === SPLIT_HORIZONTAL) {
+      overlayStyle = {viewHeight: this.state.cameraHeight / 2, imageTop: - this.state.cameraHeight / 2, imageOpacity: 1}
+    } else {
+      overlayStyle = {viewHeight: 0, imageOpacity: 0}
+    }
+
+    //  position: "absolute" on the view makes grid display properly with onion but overlay is pushed out of the way?
+    // putting grid in the view as before make it work however the view is used to clip the image halfway for SPLIT_HORIZONTAL (this.state.cameraHeight / 2)
+    return (
+      <View style={{flex: 1}}>
+        <View style={{flex: 1}}>
+          <View style={{height: overlayStyle["viewHeight"], overflow: "hidden"}}>
+            {resultImg && <Image
+              source={{uri: resultImg}}
+              style={[styles.overlayImage, {height: this.state.cameraHeight, top: overlayStyle["imageTop"], opacity: overlayStyle["imageOpacity"]},]}
+              />
+            }
+          </View>
+        </View>
+        {/*<Grid style={styles.grid} size={5} width={this.state.overlayKind !== SPLIT_HORIZONTAL && this.state.grid ? 2 : 0} color="rgba(255, 255, 255, 0.5)"/>*/}
+      </View>
+    );
+  }
+
   render() {
     let longLat = this.state.location;
     let distance = this.state.distance;
     let {optionsHeight} = this.state;
-    const resultImg = this.props.image;
-
-    const renderCameraFlip = () => {
-      if(this.state.type == Camera.Constants.Type.back) {
-        return <MaterialCommunityIcons name="camera-front" size={28} color="#F93943" style={styles.controlsIcon} />;
-      } else {
-        return <MaterialCommunityIcons name="camera-rear" size={28} color="#F93943" style={styles.controlsIcon} />;
-      }
-    }
 
     const {hasCameraPermission} = this.state;
     if(hasCameraPermission === null) {
@@ -222,21 +260,24 @@ class SceneCamera extends React.Component {
             type={this.state.type}
             onLayout={(event) => this.setState({cameraHeight: event.nativeEvent.layout.height})}
             >
+
             <Animated.View style={[styles.optionsContainer, {height: optionsHeight}]}>
               {(() => {
                 if(this.state.optionsPressed) {
                   return(
                     <View style={styles.optionsIconsContainer}>
-                      <TouchableOpacity onPress={this.displayOverlay.bind(this)}>
+                      <TouchableWithoutFeedback onPress={this.advanceOverlayKind.bind(this)}>
                         {(() => {
-                          if(this.state.overlay) {
+                          if(this.state.overlayKind === ONION) {
                             return <MaterialCommunityIcons name="layers" size={20} color="#fff" style={styles.option} />;
+                          } else if(this.state.overlayKind === SPLIT_HORIZONTAL) {
+                            return <MaterialCommunityIcons name="format-vertical-align-center" size={20} color="#fff" style={styles.option} />;
                           } else {
                             return <MaterialCommunityIcons name="layers-off" size={20} color="#fff" style={styles.option} />;
                           }
                         })()}
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={this.displayGrid.bind(this)}>
+                      </TouchableWithoutFeedback>
+                      <TouchableWithoutFeedback onPress={this.displayGrid.bind(this)}>
                         {(() => {
                           if(this.state.grid) {
                             return <MaterialCommunityIcons name="grid" size={20} color="#fff" style={styles.option} />;
@@ -244,25 +285,21 @@ class SceneCamera extends React.Component {
                             return <MaterialCommunityIcons name="grid-off" size={20} color="#fff" style={styles.option} />;
                           }
                         })()}
-                      </TouchableOpacity>
+                      </TouchableWithoutFeedback>
                       <Text style={styles.locationText}>{parseInt(distance)} metres away</Text>
                     </View>
                   )
                 }
               })()}
             </Animated.View>
-            <View style={{height: this.state.overlay ? this.state.cameraHeight : 0}}
-              {...this.panResponder.panHandlers}>
-              <TouchableWithoutFeedback>
-                <View style={{flex: 1 }}>
-                {resultImg && <Image 
-                  source={{uri: resultImg}} 
-                  style={[styles.overlayImage, {height: this.state.overlay ? this.state.cameraHeight : 0, opacity: this.state.overlayOpacity},]}
-                  />
-                }
-                <Grid size={5} width={this.state.grid ? 2 : 0} color="rgba(255, 255, 255, 0.5)"/>
-                </View>
-              </TouchableWithoutFeedback>
+            {this.renderCurrentOverlay()}
+
+            <View {...this.panResponder.panHandlers}>
+            <Grid style={styles.grid}
+                size={5} 
+                height={this.state.cameraHeight} 
+                width={this.state.overlayKind !== SPLIT_HORIZONTAL && this.state.grid ? 2 : 0} 
+                color="rgba(255, 255, 255, 0.5)"/>
             </View>
           </Camera>
           <View style={styles.controlsContainer} >
@@ -282,7 +319,7 @@ class SceneCamera extends React.Component {
                   <MaterialCommunityIcons name="tune" size={28} color="#F93943" style={{opacity: this.state.optionsPressed ? 1 : 0.6}} />
                 </TouchableOpacity>
                 <TouchableOpacity onPress={this.flipCamera.bind(this)} >
-                  {renderCameraFlip()}
+                  {this.renderCameraFlip()}
                 </TouchableOpacity>
               </View>
             </View>
@@ -343,6 +380,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: window.width,
     top: 0
+  },
+  grid: {
+    position: 'absolute',
+    top: 0,
+    //zIndex: 10000000000
   },
   locationText: {
     color: '#fff',
