@@ -25,7 +25,12 @@ application in Expo by following the [Getting Started](https://facebook.github.i
 _create-react-native-app_. Then navigate to
 
 ```
-./Now&ThenClient
+./PhotosProject
+```
+Install all dependencies with
+
+```
+npm install
 ```
 and run the application
 ```

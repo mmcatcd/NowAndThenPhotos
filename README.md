@@ -7,7 +7,7 @@ Now&Then is an Android application and API which supports the process of taking 
 ### Client Application
 
 ```
-./Now&ThenClient/
+./PhotosProject/
 ```
 
 Contains the source code for the client application for Android. The
