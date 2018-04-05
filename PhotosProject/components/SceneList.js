@@ -48,7 +48,7 @@ class SceneList extends React.Component {
         const photos = this.props.photos;
 
         return (
-            <View style={{flex: 1}}>
+            <View style={{flex: 1, backgroundColor: '#fff'}}>
                 <Modal
                     animationType="slide"
                     transparent={false}

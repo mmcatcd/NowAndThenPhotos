@@ -1,10 +1,26 @@
 {
   "expo": {
+    "name": "Now&Then",
+    "slug": "now-and-then",
     "sdkVersion": "25.0.0",
-    "orientation": "portrait"
-  },
-  "splash": {
-    "image": "./assets/splash.png",
-    "backgroundColor": "#F93943"
+    "orientation": "portrait",
+    "version": "1.0.0",
+    "platforms": ["android"],
+    "primaryColor": "#F93943",
+    "icon": "./assets/images/icon.png",
+    "privacy": "public",
+    "splash": {
+      "image": "./assets/splash.png",
+      "backgroundColor": "#F93943",
+      "resizeMode": "cover"
+    },
+    "android": {
+      "package": "com.nowandthen.nowandthen",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyCyl5ns53lMStauOYBvfM-7VKDapI3BKgY"
+        }
+      }
+    }
   }
 }

@@ -13,6 +13,14 @@ export const deleteScene = (sceneId) => ({
     sceneId
 })
 
+export const CHANGE_NAME = 'CHANGE_NAME'
+
+export const changeName = (sceneId, name) => ({
+    type: CHANGE_NAME,
+    sceneId,
+    name
+})
+
 export const CREATE_PHOTO = 'CREATE_PHOTO'
 
 export const createPhoto = (url, sceneId) => ({

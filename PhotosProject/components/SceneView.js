@@ -80,10 +80,8 @@ class SceneView extends React.Component {
                 console.log('response', res);
                 Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
                 .then(({uri}) => {
-                    CameraRoll.saveToCameraRoll(uri).then((result) => {
-                        this.props.addVideo(sceneId, result);
-                        deleteScene(sceneId);
-                    });
+                    this.props.addVideo(sceneId, uri);
+                    deleteScene(sceneId);
                 });
             });
         }
@@ -200,12 +198,6 @@ class SceneView extends React.Component {
         }
     }
 
-    deleteSceneFromList() {
-        const sceneId = this.props.navigation.state.params.sceneId;
-        this.props.deleteScene(sceneId);
-        this.props.navigation.goBack();
-    }
-
     async deletePhotos() {
         const sceneId = this.props.navigation.state.params.sceneId;
         const {longPressed} = this.state;
@@ -255,10 +247,8 @@ class SceneView extends React.Component {
             console.log('response', res);
             Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
             .then(({uri}) => {
-                CameraRoll.saveToCameraRoll(uri).then((result) => {
-                    this.props.addVideo(sceneId, result);
-                    deleteScene(sceneId);
-                });
+                this.props.addVideo(sceneId, uri);
+                deleteScene(sceneId);
             });
         });        
     }
@@ -319,7 +309,7 @@ class SceneView extends React.Component {
                     <Modal
                         visible={showTimelapse}
                         animationType="slide"
-                        transparent={true}
+                        transparent={false}
                         onRequestClose={() => this.setState({showTimelapse: false})}>
                         <Timelapse images={images} scene={sceneId} video={video} close={() => this.setState({showTimelapse: false})} />
                     </Modal>
@@ -328,7 +318,7 @@ class SceneView extends React.Component {
                         animationType="slide"
                         transparent={false}
                         onRequestClose={() => this.setState({showSettings: false})} >
-                        <Settings scene={sceneId} close={() => this.setState({showSettings: false})} deleteScene={this.deleteSceneFromList.bind(this)} />
+                        <Settings scene={sceneId} close={() => this.setState({showSettings: false})} onDelete={() => this.props.navigation.goBack()}/>
                     </Modal>
                     {camera()}
                     <ScrollView style={styles.scrollView} >

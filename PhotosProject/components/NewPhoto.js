@@ -63,7 +63,7 @@ export default class NewPhoto extends React.Component {
             let photo = await this.camera.takePictureAsync(options);
             let savedUri = await CameraRoll.saveToCameraRoll(photo.uri);
 
-            this.props.imageUpdate(savedUri);
+            await this.props.imageUpdate(savedUri);
         }
     }
 
