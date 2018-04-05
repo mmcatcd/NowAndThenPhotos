@@ -216,7 +216,7 @@ class SceneCamera extends React.Component {
     if (this.state.overlayKind === ONION) {
       overlayStyle = {viewHeight: this.state.cameraHeight, imageOpacity: this.state.overlayOpacity}
     } else if (this.state.overlayKind === SPLIT_HORIZONTAL) {
-      overlayStyle = {viewHeight: this.state.cameraHeight / 2, imageTop: - this.state.cameraHeight / 2, imageOpacity: 1}
+      overlayStyle = {viewHeight: this.state.cameraHeight / 2, imageTop: this.state.cameraHeight / 2, imageOpacity: 1}
     } else {
       overlayStyle = {viewHeight: 0, imageOpacity: 0}
     }
@@ -226,10 +226,10 @@ class SceneCamera extends React.Component {
     return (
       <View style={{flex: 1}}>
         <View style={{flex: 1}}>
-          <View style={{height: overlayStyle["viewHeight"], overflow: "hidden"}}>
+          <View style={{position: "absolute", height: overlayStyle["viewHeight"], overflow: "hidden", zIndex: 2, top: overlayStyle["imageTop"]}}>
             {resultImg && <Image
               source={{uri: resultImg}}
-              style={[styles.overlayImage, {height: this.state.cameraHeight, top: overlayStyle["imageTop"], opacity: overlayStyle["imageOpacity"]},]}
+              style={[styles.overlayImage, {height: this.state.cameraHeight, marginTop: - overlayStyle["imageTop"], position: "relative", zIndex: 1, opacity: overlayStyle["imageOpacity"]},]}
               />
             }
           </View>
@@ -375,7 +375,8 @@ const styles = StyleSheet.create({
     fontSize: 28
   },
   overlayImage: {
-    position: 'absolute',
+    //position: 'absolute',
+    //flex: 1,
     width: window.width,
     top: 0
   },
