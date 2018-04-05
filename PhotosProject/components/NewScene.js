@@ -82,7 +82,7 @@ class NewScene extends React.Component {
 
     removeLocationWatcher = null;
 
-    componentWillMount() {
+    async componentWillMount() {
         if (Platform.OS === 'android' && !Constants.isDevice) {
             this.setState({
               errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
@@ -274,7 +274,15 @@ class NewScene extends React.Component {
         });
     };
 
-    showCamera() {
+    async showCamera() {
+        let { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+        if (status !== 'granted') {
+            this.setState({
+                errorMessage: 'Permission to access location was denied',
+            });
+            console.log('Not granted!');
+        }
+
         Animated.timing(
             this.state.position,
             {
