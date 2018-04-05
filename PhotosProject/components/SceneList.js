@@ -75,7 +75,7 @@ class SceneList extends React.Component {
                             previewImage = photos[previewImageId].url;
                         }
                         return(
-                            <View style={{flex: 1}}>
+                            <View style={{flex: 1}} key={id}>
                                 <ScenePreview scene={scene} previewImage={previewImage} onPress={() => this.props.navigation.navigate('SceneView', {sceneId: id})} />
                             </View>
                         )
