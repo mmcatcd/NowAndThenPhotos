@@ -6,7 +6,8 @@ import {
   StyleSheet,
   Image,
   Dimensions,
-  CameraRoll
+  CameraRoll,
+  ToastAndroid
 } from 'react-native';
 import NavBar from './NavBar';
 import {Video, FileSystem} from 'expo';
@@ -35,6 +36,11 @@ export default class Timelapse extends React.Component {
 		this.setState(prevState => ({
 			mute: !prevState.mute,
 		}));
+  }
+
+  saveVideo() {
+    CameraRoll.saveToCameraRoll(this.props.video);
+    ToastAndroid.show('Saved video to Camera Roll', ToastAndroid.SHORT);
   }
 
   render() {
@@ -75,18 +81,14 @@ export default class Timelapse extends React.Component {
           {renderVideo()}
         </TouchableOpacity>
         <View style={styles.shareContainer}>
-          <MaterialIcons 
-            name="save"
-            size={30} 
-            color="white" 
-            onPress={this.handleVolume}
-            style={styles.icon} />
-          <MaterialIcons 
-            name="share"
-            size={30} 
-            color="white" 
-            onPress={this.handleVolume}
-            style={styles.icon} />
+          <TouchableOpacity onPress={this.saveVideo.bind(this)}>
+            <MaterialIcons 
+              name="save"
+              size={30} 
+              color="white" 
+              style={styles.icon}
+              />
+          </TouchableOpacity>
         </View>
       </View>
     )
@@ -122,10 +124,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row'
+    flexDirection: 'row',
   },
   icon: {
-    marginLeft: 10,
-    marginRight: 10
+    marginLeft: 40,
+    marginRight: 40,
+    zIndex: 10000
   }
 })

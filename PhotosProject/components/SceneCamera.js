@@ -146,10 +146,8 @@ class SceneCamera extends React.Component {
           console.log('response', res);
           Expo.FileSystem.downloadAsync(serverAdr + res.url, FileSystem.documentDirectory + 'video.mp4')
           .then(({uri}) => {
-              CameraRoll.saveToCameraRoll(uri).then((result) => {
-                  this.props.addVideo(sceneId, result);
-                  deleteScene(sceneId);
-              });
+              this.props.addVideo(sceneId, uri);
+              deleteScene(sceneId);
           });
       });
     } else {
