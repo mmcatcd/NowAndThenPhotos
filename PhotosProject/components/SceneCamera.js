@@ -234,7 +234,6 @@ class SceneCamera extends React.Component {
             }
           </View>
         </View>
-        {/*<Grid style={styles.grid} size={5} width={this.state.overlayKind !== SPLIT_HORIZONTAL && this.state.grid ? 2 : 0} color="rgba(255, 255, 255, 0.5)"/>*/}
       </View>
     );
   }
