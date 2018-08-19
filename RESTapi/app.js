@@ -4,6 +4,7 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
 const sceneRoutes = require('./api/routes/scenes');
+const twitterRoutes = require('./api/routes/twitter');
 
 app.use(morgan('dev'));
 app.use('/scenes', express.static('scenes')); //makes scenes folder static
@@ -26,6 +27,7 @@ app.use((req, res, next) => {
 
 //Routes which should handle requests
 app.use('/scenes', sceneRoutes);
+app.use('/twitter', twitterRoutes);
 
 app.get('/', (req, res, next) => {
     res.sendFile(__dirname+"/static/index.html");
