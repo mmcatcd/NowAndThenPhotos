@@ -56,5 +56,9 @@ node_modules
 /ReactAndroid/src/androidTest/assets/AndroidTestBundle.js
 *.js.meta
 
+# Vim swap files
+*.swp
+*.swo
+
 /coverage
 /third-party
