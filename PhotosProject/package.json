@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "devDependencies": {
-    "jest-expo": "25.0.0",
-    "react-native-scripts": "^1.13.2",
+    "jest-expo": "^29.0.0",
+    "react-native-scripts": "^1.14.1",
     "react-test-renderer": "16.2.0"
   },
   "main": "./node_modules/react-native-scripts/build/bin/crna-entry.js",
@@ -21,9 +21,9 @@
   "dependencies": {
     "d3-scale": "^2.0.0",
     "expo": "^25.0.0",
-    "npm": "^5.8.0",
+    "npm": "^6.4.0",
     "react": "16.2.0",
-    "react-native": "0.52.0",
+    "react-native": "^0.56.0",
     "react-native-camera": "^0.13.0",
     "react-native-elements": "^0.19.1",
     "react-native-gesture-handler": "^1.0.0-alpha.43",
