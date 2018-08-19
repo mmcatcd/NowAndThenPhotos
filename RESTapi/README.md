@@ -16,3 +16,9 @@ To start the server
 ```
 $ npm start
 ```
+
+The server can also be run in the background as a service using forever
+
+```
+$ forever start server.js
+```
