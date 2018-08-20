@@ -9,6 +9,17 @@ var client = new Twitter({
   access_token_secret: process.env.TWITTER_TOKEN_SECRET
 });
 
+router.get('/user-data', (req, res, next) => {
+  client.get('users/show', req.query, function(error, user, response) {
+    if (!error) {
+      res.status(200).json({
+        tweets: user.statuses_count,
+        followers: user.followers_count
+      });
+    }
+  });
+});
+
 router.get('/followers', (req, res, next) => {
   client.get('users/show', req.query, function(error, user, response) {
     if (!error) {
